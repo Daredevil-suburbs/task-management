@@ -15,7 +15,7 @@
     <artifactId>task-management</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>task-management</name>
-    <description>Task Management System - Spring Boot + MySQL</description>
+    <description>Hunter System - Spring Boot + MySQL</description>
 
     <properties>
         <java.version>17</java.version>
@@ -54,7 +54,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring Security (JWT Auth) -->
+        <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -99,6 +99,23 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Explicitly wire Lombok annotation processor -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>
