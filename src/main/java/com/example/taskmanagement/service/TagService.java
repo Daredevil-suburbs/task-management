@@ -42,6 +42,7 @@ public class TagService {
                 .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("null")
     public TagDTO.Response updateTag(Long id, TagDTO.Request request, String email) {
         User user = getUser(email);
         Tag tag = tagRepository.findByIdAndUserId(id, user.getId())
@@ -51,6 +52,7 @@ public class TagService {
         return TagDTO.Response.fromTag(tagRepository.save(tag));
     }
 
+    @SuppressWarnings("null")
     public void deleteTag(Long id, String email) {
         User user = getUser(email);
         Tag tag = tagRepository.findByIdAndUserId(id, user.getId())

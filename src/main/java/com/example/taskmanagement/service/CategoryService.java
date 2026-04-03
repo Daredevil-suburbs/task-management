@@ -43,6 +43,7 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("null")
     public CategoryDTO.Response updateCategory(Long id, CategoryDTO.Request request, String email) {
         User user = getUser(email);
         Category category = categoryRepository.findByIdAndUserId(id, user.getId())
@@ -54,6 +55,7 @@ public class CategoryService {
         return CategoryDTO.Response.fromCategory(categoryRepository.save(category));
     }
 
+    @SuppressWarnings("null")
     public void deleteCategory(Long id, String email) {
         User user = getUser(email);
         Category category = categoryRepository.findByIdAndUserId(id, user.getId())
