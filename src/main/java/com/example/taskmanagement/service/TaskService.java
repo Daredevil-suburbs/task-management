@@ -74,7 +74,6 @@ public class TaskService {
     }
 
     // ── Update Quest ───────────────────────────────────────────────────────
-    @SuppressWarnings("null")
     public TaskDTO.Response updateTask(Long id, TaskDTO.Request request, String email) {
         User user = getUser(email);
         Task task = taskRepository.findByIdAndUserId(id, user.getId())
@@ -98,7 +97,6 @@ public class TaskService {
 
     // ── COMPLETE QUEST — awards XP and recalculates rank ──────────────────
     @Transactional
-    @SuppressWarnings("null")
     public TaskDTO.CompleteResponse completeTask(Long id, String email) {
         User user = getUser(email);
         Task task = taskRepository.findByIdAndUserId(id, user.getId())
@@ -145,7 +143,6 @@ public class TaskService {
     }
 
     // ── Delete Quest ───────────────────────────────────────────────────────
-    @SuppressWarnings("null")
     public void deleteTask(Long id, String email) {
         User user = getUser(email);
         Task task = taskRepository.findByIdAndUserId(id, user.getId())
