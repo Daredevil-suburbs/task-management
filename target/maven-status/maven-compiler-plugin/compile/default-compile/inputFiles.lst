@@ -18,6 +18,7 @@ C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\repository\TagRepository.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\repository\TaskRepository.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\repository\UserRepository.java
+C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\security\CorsConfig.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\security\JwtAuthFilter.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\security\JwtUtils.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\security\SecurityConfig.java
