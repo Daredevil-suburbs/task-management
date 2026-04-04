@@ -1,0 +1,32 @@
+.wrapper { margin-bottom: 20px; }
+
+.form {
+  border-color: var(--purple-dark);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.1);
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.formHeader h3 {
+  font-size: 16px;
+  color: var(--purple-light);
+  letter-spacing: 0.15em;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
