@@ -14,9 +14,17 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthController.class);
+
     @PostMapping("/register")
     public ResponseEntity<AuthDTO.AuthResponse> register(@Valid @RequestBody AuthDTO.RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+        logger.info("New registration request for email: {}", request.getEmail());
+        try {
+            return ResponseEntity.ok(authService.register(request));
+        } catch (Exception e) {
+            logger.error("Registration failed for email: {} - Error: {}", request.getEmail(), e.getMessage());
+            throw e;
+        }
     }
 
     @PostMapping("/login")
