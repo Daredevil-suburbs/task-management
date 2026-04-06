@@ -16,7 +16,9 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
             "http://localhost:5173",   // Vite dev server
-            "http://localhost:4173"    // Vite preview
+            "http://localhost:4173",   // Vite preview
+            "http://localhost:8081",   // Expo Metro server (web)
+            "http://192.168.1.3:8081"  // Mobile local IP
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
