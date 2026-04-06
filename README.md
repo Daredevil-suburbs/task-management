@@ -14,6 +14,8 @@
 | ORM      | Spring Data JPA / Hibernate           |
 | Auth     | Spring Security + JWT                 |
 | Frontend | React 18, Vite, React Router          |
+| Mobile   | React Native (Expo), Expo Router      |
+| Health   | Health Connect (Android)              |
 | Styling  | CSS Modules, Solo Leveling dark theme |
 
 ---
@@ -48,6 +50,18 @@
 - Responsive layout (mobile friendly)
 - Solo Leveling dark theme (black + purple + gold)
 
+### Mobile App (React Native / Expo)
+
+- Full port of web frontend to React Native
+- Expo Router for navigation (login, register, dashboard)
+- AsyncStorage for JWT persistence
+- Health Connect integration (steps, heart rate, sleep)
+- Health data sync — reads from watch, stores to backend
+- Animated XP progress bar with Linear Gradient
+- Native pull-to-refresh on quest list
+- Slide-up modal for quest creation
+- Health stats dashboard card (Steps, Avg HR, Sleep)
+
 ---
 
 ## 🔲 What's Not Done Yet
@@ -57,7 +71,7 @@
 - [ ] **ADHD Tracker** — mood log, trigger tracker, med tracker
 - [ ] **Recurring daily quests** — habits like "take meds", "drink water"
 - [ ] **Achievements / Badges** — "Complete 10 quests", "Reach B Rank"
-- [ ] **Android companion app** — reads Mi Watch data via Health Connect
+- [x] **Android companion app** — reads Mi Watch data via Health Connect ✅
 
 ### Medium Priority
 
@@ -119,6 +133,20 @@ task-management/
 │   │   └── index.css        # Global Solo Leveling theme
 │   ├── package.json
 │   └── vite.config.js
+├── mobile/                  # React Native app (Expo)
+│   ├── app/                 # Expo Router screens
+│   │   ├── _layout.js       # Root layout with AuthProvider
+│   │   ├── index.js         # Auth redirect
+│   │   ├── login.js         # Hunter login screen
+│   │   ├── register.js      # Hunter registration screen
+│   │   └── dashboard.js     # Quest board + health stats
+│   ├── src/
+│   │   ├── components/      # StatusPanel, QuestCard, QuestList, AddQuest, XPProgressBar
+│   │   ├── context/         # AuthContext (AsyncStorage-based)
+│   │   ├── services/        # api.js + health.js (Health Connect)
+│   │   └── theme.js         # Solo Leveling color tokens
+│   ├── app.json
+│   └── package.json
 └── pom.xml
 ```
 
@@ -158,6 +186,14 @@ task-management/
 | PUT/DELETE | /api/categories/{id} | Update or delete category |
 | GET/POST   | /api/tags            | List or create tags       |
 | PUT/DELETE | /api/tags/{id}       | Update or delete tag      |
+
+### Health (JWT required)
+
+| Method | Endpoint              | Description                             |
+| ------ | --------------------- | --------------------------------------- |
+| POST   | /api/health/sync      | Sync today's health data from phone     |
+| GET    | /api/health/today     | Get today's health record               |
+| GET    | /api/health/history   | Get health history (query: ?days=7)     |
 
 ---
 
@@ -216,6 +252,23 @@ npm run dev
 
 Open 👉 http://localhost:5173
 
+### Mobile App
+
+```bash
+cd task-management/mobile
+npm install
+
+# Development (Expo Go — no Health Connect)
+npx expo start
+
+# Production build with Health Connect (requires Android SDK)
+npx expo prebuild --platform android --clean
+npx expo run:android
+```
+
+> ⚠️ Health Connect features require a **development build** (`npx expo run:android`).
+> Expo Go only works for the quest board features.
+
 ---
 
 ## 🧠 ADHD Design Philosophy
@@ -226,4 +279,5 @@ This app is built with ADHD in mind:
 - **Visual rank progression** creates long-term motivation
 - **Priority system** helps focus on what matters most
 - **XP multipliers** reward tackling hard tasks
-- **Planned:** mood tracking, trigger logging, med reminders, watch data integration
+- **Health tracking** — sleep, heart rate, and steps from your watch, synced daily
+- **Planned:** mood tracking, trigger logging, med reminders
