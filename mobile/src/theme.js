@@ -2,7 +2,7 @@ export const Colors = {
   bgPrimary:    '#0a0a0f',
   bgSecondary:  '#111118',
   bgCard:       '#16161f',
-  bgHover:     ' #1e1e2a',
+  bgHover:      '#1e1e2a',
 
   purpleLight:  '#c084fc',
   purple:        '#a855f7',
