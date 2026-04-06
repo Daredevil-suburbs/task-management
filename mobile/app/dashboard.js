@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
+import { healthService } from '../src/services/health';
 import { Colors } from '../src/theme';
 import StatusPanel from '../src/components/StatusPanel';
 import QuestList from '../src/components/QuestList';
 import AddQuest from '../src/components/AddQuest';
-import { questAPI } from '../src/services/api';
-import { LogOut, Filter } from 'lucide-react-native';
+import { questAPI, healthAPI } from '../src/services/api';
+import { LogOut, Filter, Activity, Heart, Moon, RefreshCw } from 'lucide-react-native';
 
 const FILTERS = [
   { label: 'ALL', value: {} },
@@ -21,6 +22,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [activeFilter, setActiveFilter] = useState(0);
+  const [healthData, setHealthData] = useState(null);
+  const [syncing, setSyncing] = useState(false);
 
   const fetchQuests = useCallback(async (filterValue = FILTERS[activeFilter].value) => {
     setLoading(true);
@@ -37,6 +40,13 @@ export default function Dashboard() {
   useEffect(() => {
     fetchQuests();
   }, [fetchQuests, refreshTrigger]);
+
+  // Load today's health data from backend on mount
+  useEffect(() => {
+    healthAPI.getToday()
+      .then(res => { if (res.data) setHealthData(res.data); })
+      .catch(() => {}); // 204 No Content = not synced yet
+  }, []);
 
   const handleQuestAdded = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -65,6 +75,34 @@ export default function Dashboard() {
     fetchQuests(FILTERS[index].value);
   };
 
+  const syncHealth = async () => {
+    setSyncing(true);
+    try {
+      const isAvailable = await healthService.checkAvailability();
+      if (!isAvailable) { setSyncing(false); return; }
+
+      await healthService.initialize();
+      await healthService.requestPermissions();
+      
+      const data = await healthService.fetchTodayData();
+      if (data) {
+        // Send to Spring Boot backend
+        const res = await healthAPI.sync({
+          steps: data.steps,
+          heartRate: data.heartRate,
+          sleepMinutes: data.sleepMinutes,
+        });
+        setHealthData(res.data);
+        console.log('Health data synced to backend:', res.data);
+      }
+    } catch (err) {
+      console.error('Sync failed', err);
+      Alert.alert('Sync Failed', 'Could not sync health data. Make sure Health Connect is set up.');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -79,6 +117,35 @@ export default function Dashboard() {
 
       <View style={styles.content}>
         <StatusPanel refreshTrigger={refreshTrigger} />
+
+        <View style={styles.healthStats}>
+          <TouchableOpacity style={styles.syncCard} onPress={syncHealth} disabled={syncing}>
+            <View style={styles.syncHeader}>
+              <Text style={styles.healthTitle}>HEALTH STATS (DAILY)</Text>
+              {syncing ? <ActivityIndicator size="small" color={Colors.gold} /> : <RefreshCw size={12} color={Colors.gold} />}
+            </View>
+            
+            <View style={styles.healthItems}>
+              <View style={styles.healthItem}>
+                <Activity size={16} color={Colors.rankC} />
+                <Text style={styles.healthValue}>{healthData?.steps || '--'}</Text>
+                <Text style={styles.healthLabel}>Steps</Text>
+              </View>
+              <View style={styles.healthDivider} />
+              <View style={styles.healthItem}>
+                <Heart size={16} color={Colors.danger} />
+                <Text style={styles.healthValue}>{healthData?.avgHeartRate || healthData?.heartRate || '--'} bpm</Text>
+                <Text style={styles.healthLabel}>Avg HR</Text>
+              </View>
+              <View style={styles.healthDivider} />
+              <View style={styles.healthItem}>
+                <Moon size={16} color={Colors.purpleLight} />
+                <Text style={styles.healthValue}>{healthData ? Math.floor(healthData.sleepMinutes / 60) + 'h ' + (healthData.sleepMinutes % 60) + 'm' : '--'}</Text>
+                <Text style={styles.healthLabel}>Sleep</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.boardHeader}>
           <View style={styles.filterRow}>
@@ -186,4 +253,51 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
+  healthStats: {
+    marginBottom: 20,
+  },
+  syncCard: {
+    backgroundColor: Colors.bgSecondary,
+    borderRadius: 10,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  syncHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  healthTitle: {
+    color: Colors.textSecondary,
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  healthItems: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  healthItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  healthValue: {
+    color: Colors.textPrimary,
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginVertical: 4,
+  },
+  healthLabel: {
+    color: Colors.textMuted,
+    fontSize: 8,
+    textTransform: 'uppercase',
+  },
+  healthDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  }
 });
