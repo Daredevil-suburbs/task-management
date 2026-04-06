@@ -67,4 +67,11 @@ export const categoryAPI = {
   delete:  (id)       => api.delete(`/categories/${id}`),
 };
 
+// ── Health ────────────────────────────────────────────
+export const healthAPI = {
+  sync:      (data)   => api.post('/health/sync', data),
+  getToday:  ()       => api.get('/health/today'),
+  getHistory:(days=7) => api.get('/health/history', { params: { days } }),
+};
+
 export default api;
