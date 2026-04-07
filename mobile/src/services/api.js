@@ -5,7 +5,7 @@ import Constants from 'expo-constants';
 // For local development with Expo on physical device:
 // Use your machine's local IP (e.g. 192.168.1.10) instead of localhost
 // If running on Android Emulator, use 10.0.2.2
-const LOCAL_IP = '192.168.1.3'; // Auto-detected from ipconfig
+const LOCAL_IP = '172.30.8.157'; // Current Wi-Fi IP
 const BASE_URL = `http://${LOCAL_IP}:8080/api`;
 
 const api = axios.create({
