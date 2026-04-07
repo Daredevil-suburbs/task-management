@@ -1,7 +1,7 @@
 package com.example.taskmanagement.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -31,8 +31,8 @@ public class HealthRecord {
     @Column(nullable = false)
     private int sleepMinutes = 0;
 
-    @CreationTimestamp
-    @Column(updatable = false)
+    @UpdateTimestamp
+    @Column
     private LocalDateTime syncedAt;
 
     // Getters & Setters
