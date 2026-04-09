@@ -27,4 +27,5 @@ sync_latest.ps1
 sync_one_by_one.ps1
 sync_script.ps1
 sync_script_restarted.ps1
+sync_v4_ordered.ps1
 app_start.log
