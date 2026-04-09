@@ -77,13 +77,13 @@
 
 ### Medium Priority
 
-- [ ] **Subtasks** — checklist items inside a quest
-- [ ] **Quest search** — search by title/description
-- [ ] **Sorting** — by due date, priority, XP reward
-- [ ] **Pagination** — for users with many quests
-- [ ] **Profile editing** — change name, password
-- [ ] **Password reset** — forgot password flow
-- [ ] **Streak tracking** — consecutive days completing quests
+- [x] **Subtasks** — checklist items inside a quest ✅
+- [x] **Quest search** — search by title/description ✅
+- [x] **Sorting** — by due date, priority, XP reward ✅
+- [x] **Pagination** — for users with many quests ✅
+- [x] **Profile editing** — change name, password ✅
+- [x] **Password reset** — forgot password flow ✅
+- [x] **Streak tracking** — consecutive days completing quests ✅
 
 ### Polish & Production
 
