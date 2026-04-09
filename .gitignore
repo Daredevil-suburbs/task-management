@@ -23,4 +23,8 @@ yarn-error.log*
 
 # Scripts
 sync_v3.ps1
+sync_latest.ps1
+sync_one_by_one.ps1
+sync_script.ps1
+sync_script_restarted.ps1
 app_start.log
