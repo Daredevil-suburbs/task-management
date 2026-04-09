@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,63 @@ public class TaskService {
             tasks = taskRepository.findByUserIdAndPriority(user.getId(), priority);
         } else {
             tasks = taskRepository.findByUserId(user.getId());
+        }
+
+        return tasks.stream().map(TaskDTO.Response::fromTask).collect(Collectors.toList());
+    }
+
+    // ── Search Quests ──────────────────────────────────────────────────────
+    public List<TaskDTO.Response> searchTasks(String email, String query) {
+        User user = getUser(email);
+        if (query == null || query.trim().isEmpty()) {
+            return getAllTasks(email, null, null);
+        }
+        List<Task> tasks = taskRepository.searchByUserId(user.getId(), query.trim());
+        return tasks.stream().map(TaskDTO.Response::fromTask).collect(Collectors.toList());
+    }
+
+    // ── Get Quests with Sorting and Pagination ─────────────────────────────
+    public List<TaskDTO.Response> getTasksWithSortAndPage(String email,
+                                                           String sortBy,
+                                                           String sortDir,
+                                                           Integer page,
+                                                           Integer size) {
+        User user = getUser(email);
+        List<Task> tasks = taskRepository.findByUserId(user.getId());
+
+        // Apply sorting
+        if (sortBy != null && !sortBy.isEmpty()) {
+            tasks.sort((a, b) -> {
+                int cmp;
+                switch (sortBy.toLowerCase()) {
+                    case "duedate":
+                        if (a.getDueDate() == null && b.getDueDate() == null) return 0;
+                        if (a.getDueDate() == null) return 1;
+                        if (b.getDueDate() == null) return -1;
+                        cmp = a.getDueDate().compareTo(b.getDueDate());
+                        break;
+                    case "priority":
+                        cmp = a.getPriority().compareTo(b.getPriority());
+                        break;
+                    case "xpreward":
+                        cmp = Integer.compare(a.getXpReward(), b.getXpReward());
+                        break;
+                    case "createdat":
+                    default:
+                        cmp = a.getCreatedAt().compareTo(b.getCreatedAt());
+                }
+                return "desc".equalsIgnoreCase(sortDir) ? cmp * -1 : cmp;
+            });
+        }
+
+        // Apply pagination
+        if (page != null && size != null && page > 0 && size > 0) {
+            int start = (page - 1) * size;
+            if (start >= tasks.size()) {
+                return Collections.emptyList();
+            }
+            int end = Math.min(start + size, tasks.size());
+            tasks = tasks.subList(start, end);
         }
 
         return tasks.stream().map(TaskDTO.Response::fromTask).collect(Collectors.toList());
