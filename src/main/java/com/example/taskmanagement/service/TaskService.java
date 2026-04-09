@@ -1,5 +1,6 @@
 package com.example.taskmanagement.service;
 
+import com.example.taskmanagement.dto.AchievementDTO;
 import com.example.taskmanagement.dto.TaskDTO;
 import com.example.taskmanagement.model.*;
 import com.example.taskmanagement.repository.CategoryRepository;
@@ -23,6 +24,7 @@ public class TaskService {
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private TagRepository tagRepository;
     @Autowired private LevelService levelService;
+    @Autowired private AchievementService achievementService;
 
     // ── Create Quest ───────────────────────────────────────────────────────
     public TaskDTO.Response createTask(TaskDTO.Request request, String email) {
@@ -122,6 +124,10 @@ public class TaskService {
         levelService.awardXp(user, baseXp, task.getPriority());
         userRepository.save(user);
 
+        // Check for newly unlocked achievements
+        List<AchievementDTO.UnlockNotification> newAchievements =
+                achievementService.checkAndAward(user);
+
         // Build response
         HunterRank rankAfter = user.getHunterRank();
         boolean rankUp = rankAfter != rankBefore;
@@ -138,6 +144,7 @@ public class TaskService {
                 "RANK UP! You are now " + rankAfter.getDisplayName() + "!"
             );
         }
+        response.setNewAchievements(newAchievements);
 
         return response;
     }
