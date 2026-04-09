@@ -51,6 +51,7 @@ public class TaskDTO {
         private LocalDateTime completedAt;
         private CategoryDTO.Response category;
         private List<TagDTO.Response> tags;
+        private List<SubtaskDTO.Response> subtasks;
         private Long recurringQuestId;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
@@ -73,6 +74,8 @@ public class TaskDTO {
                 r.category = CategoryDTO.Response.fromCategory(t.getCategory());
             if (t.getTags() != null)
                 r.tags = t.getTags().stream().map(TagDTO.Response::fromTag).collect(Collectors.toList());
+            if (t.getSubtasks() != null)
+                r.subtasks = t.getSubtasks().stream().map(SubtaskDTO.Response::fromSubtask).collect(Collectors.toList());
             return r;
         }
 
@@ -87,6 +90,7 @@ public class TaskDTO {
         public LocalDateTime getCompletedAt() { return completedAt; }
         public CategoryDTO.Response getCategory() { return category; }
         public List<TagDTO.Response> getTags() { return tags; }
+        public List<SubtaskDTO.Response> getSubtasks() { return subtasks; }
         public Long getRecurringQuestId() { return recurringQuestId; }
         public LocalDateTime getCreatedAt() { return createdAt; }
         public LocalDateTime getUpdatedAt() { return updatedAt; }
