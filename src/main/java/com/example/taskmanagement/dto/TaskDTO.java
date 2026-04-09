@@ -51,6 +51,7 @@ public class TaskDTO {
         private LocalDateTime completedAt;
         private CategoryDTO.Response category;
         private List<TagDTO.Response> tags;
+        private Long recurringQuestId;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -65,6 +66,7 @@ public class TaskDTO {
             r.xpReward = t.getXpReward();
             r.completed = t.getStatus() == Task.Status.DONE;
             r.completedAt = t.getCompletedAt();
+            r.recurringQuestId = t.getRecurringQuestId();
             r.createdAt = t.getCreatedAt();
             r.updatedAt = t.getUpdatedAt();
             if (t.getCategory() != null)
@@ -85,6 +87,7 @@ public class TaskDTO {
         public LocalDateTime getCompletedAt() { return completedAt; }
         public CategoryDTO.Response getCategory() { return category; }
         public List<TagDTO.Response> getTags() { return tags; }
+        public Long getRecurringQuestId() { return recurringQuestId; }
         public LocalDateTime getCreatedAt() { return createdAt; }
         public LocalDateTime getUpdatedAt() { return updatedAt; }
     }
@@ -97,6 +100,7 @@ public class TaskDTO {
         private String hunterRank;
         private boolean rankUpOccurred;
         private String rankUpMessage;
+        private java.util.List<AchievementDTO.UnlockNotification> newAchievements;
 
         public Response getTask() { return task; }
         public void setTask(Response t) { this.task = t; }
@@ -112,5 +116,7 @@ public class TaskDTO {
         public void setRankUpOccurred(boolean r) { this.rankUpOccurred = r; }
         public String getRankUpMessage() { return rankUpMessage; }
         public void setRankUpMessage(String m) { this.rankUpMessage = m; }
+        public java.util.List<AchievementDTO.UnlockNotification> getNewAchievements() { return newAchievements; }
+        public void setNewAchievements(java.util.List<AchievementDTO.UnlockNotification> a) { this.newAchievements = a; }
     }
 }
