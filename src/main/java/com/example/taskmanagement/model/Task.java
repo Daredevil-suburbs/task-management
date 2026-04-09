@@ -41,6 +41,9 @@ public class Task {
 
     private LocalDateTime completedAt;
 
+    /** If this task was spawned from a recurring quest, this links back to the template */
+    private Long recurringQuestId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -83,6 +86,8 @@ public class Task {
     public void setXpReward(int xpReward) { this.xpReward = xpReward; }
     public LocalDateTime getCompletedAt() { return completedAt; }
     public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+    public Long getRecurringQuestId() { return recurringQuestId; }
+    public void setRecurringQuestId(Long recurringQuestId) { this.recurringQuestId = recurringQuestId; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
     public Category getCategory() { return category; }
