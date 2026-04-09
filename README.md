@@ -35,6 +35,8 @@
 - User status endpoint (level, XP, rank, quests completed)
 - Global error handling
 - CORS configuration for frontend
+- **Recurring daily quests** — habit templates that auto-spawn daily tasks at midnight
+- **Achievements / Badges** — 16 badges across quest, rank, XP, and streak categories; auto-evaluated on quest completion
 
 ### Frontend
 
@@ -68,9 +70,9 @@
 
 ### High Priority
 
+- [x] **Recurring daily quests** — habits like "take meds", "drink water" ✅
+- [x] **Achievements / Badges** — "Complete 10 quests", "Reach B Rank" ✅
 - [ ] **ADHD Tracker** — mood log, trigger tracker, med tracker
-- [ ] **Recurring daily quests** — habits like "take meds", "drink water"
-- [ ] **Achievements / Badges** — "Complete 10 quests", "Reach B Rank"
 - [x] **Android companion app** — reads Mi Watch data via Health Connect ✅
 
 ### Medium Priority
@@ -104,20 +106,29 @@ task-management/
 │   │   ├── TaskController
 │   │   ├── CategoryController
 │   │   ├── TagController
-│   │   └── UserController
+│   │   ├── UserController
+│   │   ├── RecurringQuestController
+│   │   └── AchievementController
 │   ├── service/             # Business logic
 │   │   ├── AuthService
 │   │   ├── TaskService
 │   │   ├── CategoryService
 │   │   ├── TagService
 │   │   ├── UserService
-│   │   └── LevelService     # XP + rank engine
+│   │   ├── LevelService          # XP + rank engine
+│   │   ├── RecurringQuestService  # Habit CRUD + daily spawn
+│   │   ├── AchievementService     # Badge check + award engine
+│   │   ├── AchievementSeeder      # Seeds badge definitions on startup
+│   │   └── DailyQuestScheduler    # Midnight cron job
 │   ├── model/               # JPA entities
 │   │   ├── User
 │   │   ├── Task
 │   │   ├── Category
 │   │   ├── Tag
-│   │   └── HunterRank       # E, D, C, B, A, S enum
+│   │   ├── HunterRank       # E, D, C, B, A, S enum
+│   │   ├── RecurringQuest   # Daily habit templates
+│   │   ├── Achievement      # Badge definitions
+│   │   └── UserAchievement  # User ↔ Achievement unlock records
 │   ├── repository/          # Spring Data JPA
 │   ├── dto/                 # Request + Response objects
 │   ├── security/            # JWT filter, config, CORS
@@ -194,6 +205,24 @@ task-management/
 | POST   | /api/health/sync      | Sync today's health data from phone     |
 | GET    | /api/health/today     | Get today's health record               |
 | GET    | /api/health/history   | Get health history (query: ?days=7)     |
+
+### Recurring Quests (JWT required)
+
+| Method | Endpoint                 | Description                                |
+| ------ | ------------------------ | ------------------------------------------ |
+| GET    | /api/recurring           | List all recurring quest templates         |
+| POST   | /api/recurring           | Create a recurring quest template          |
+| GET    | /api/recurring/{id}      | Get a specific recurring quest             |
+| PUT    | /api/recurring/{id}      | Update a recurring quest template          |
+| DELETE | /api/recurring/{id}      | Deactivate (soft delete) a recurring quest |
+| POST   | /api/recurring/spawn     | Manually trigger daily quest creation      |
+
+### Achievements (JWT required)
+
+| Method | Endpoint                   | Description                                |
+| ------ | -------------------------- | ------------------------------------------ |
+| GET    | /api/achievements          | All achievements with unlock status        |
+| GET    | /api/achievements/unlocked | Only the user's unlocked badges            |
 
 ---
 
