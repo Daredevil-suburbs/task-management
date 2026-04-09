@@ -3,6 +3,7 @@ package com.example.taskmanagement.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -28,6 +29,18 @@ public class User {
 
     @Column(nullable = false)
     private int totalXp = 0;
+
+    @Column
+    private String resetToken;
+
+    @Column
+    private LocalDateTime resetTokenExpiry;
+
+    @Column
+    private LocalDateTime lastStreakDate;
+
+    @Column(nullable = false)
+    private int currentStreak = 0;
 
     @Column(nullable = false)
     private int level = 1;
@@ -55,4 +68,12 @@ public class User {
     public void setHunterRank(HunterRank hunterRank) { this.hunterRank = hunterRank; }
     public List<Task> getTasks() { return tasks; }
     public void setTasks(List<Task> tasks) { this.tasks = tasks; }
+    public String getResetToken() { return resetToken; }
+    public void setResetToken(String resetToken) { this.resetToken = resetToken; }
+    public LocalDateTime getResetTokenExpiry() { return resetTokenExpiry; }
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) { this.resetTokenExpiry = resetTokenExpiry; }
+    public LocalDateTime getLastStreakDate() { return lastStreakDate; }
+    public void setLastStreakDate(LocalDateTime lastStreakDate) { this.lastStreakDate = lastStreakDate; }
+    public int getCurrentStreak() { return currentStreak; }
+    public void setCurrentStreak(int currentStreak) { this.currentStreak = currentStreak; }
 }
