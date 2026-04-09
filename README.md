@@ -245,6 +245,25 @@ task-management/
 | POST   | /api/user/password/reset-request | Request password reset (returns token) |
 | POST   | /api/user/password/reset-confirm | Confirm password reset with token     |
 
+### Query Parameters
+
+#### GET /api/tasks
+
+| Parameter | Type   | Description                              |
+| --------- | ------ | ---------------------------------------- |
+| status    | string | Filter by status: TODO, IN_PROGRESS, DONE |
+| priority  | string | Filter by priority: LOW, MEDIUM, HIGH    |
+| sortBy    | string | Sort field: dueDate, priority, xpReward, createdAt |
+| sortDir   | string | Sort direction: asc, desc (default: asc) |
+| page      | int    | Page number (1-indexed)                  |
+| size      | int    | Items per page                           |
+
+#### GET /api/tasks/search
+
+| Parameter | Type   | Description                    |
+| --------- | ------ | ------------------------------ |
+| q         | string | Search query (title/description) |
+
 ---
 
 ## ⚡ XP System
