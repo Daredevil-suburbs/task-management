@@ -87,12 +87,12 @@
 
 ### Polish & Production
 
-- [ ] **Swagger / OpenAPI docs** — auto-generated API documentation
-- [ ] **Docker setup** — Dockerfile + docker-compose for easy deployment
-- [ ] **Unit + integration tests** — service and controller tests
-- [ ] **Rate limiting** — brute-force protection on login
-- [ ] **Environment variables** — move JWT secret out of properties file
-- [ ] **Leaderboard** — top hunters by XP
+- [x] **Swagger / OpenAPI docs** — auto-generated API documentation ✅
+- [x] **Docker setup** — Dockerfile + docker-compose for easy deployment ✅
+- [x] **Unit + integration tests** — service and controller tests (55 tests) ✅
+- [x] **Rate limiting** — brute-force protection on login (5 attempts, 15min lock) ✅
+- [x] **Environment variables** — JWT secret + DB creds externalized ✅
+- [x] **Leaderboard** — top hunters by XP ✅
 
 ---
 
