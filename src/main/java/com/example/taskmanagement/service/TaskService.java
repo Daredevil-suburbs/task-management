@@ -26,6 +26,7 @@ public class TaskService {
     @Autowired private TagRepository tagRepository;
     @Autowired private LevelService levelService;
     @Autowired private AchievementService achievementService;
+    @Autowired private UserService userService;
 
     // ── Create Quest ───────────────────────────────────────────────────────
     public TaskDTO.Response createTask(TaskDTO.Request request, String email) {
@@ -180,7 +181,9 @@ public class TaskService {
 
         // Award XP → mutates user fields in place
         levelService.awardXp(user, baseXp, task.getPriority());
-        userRepository.save(user);
+
+        // Update streak
+        userService.updateStreakOnQuestCompletion(user);
 
         // Check for newly unlocked achievements
         List<AchievementDTO.UnlockNotification> newAchievements =
