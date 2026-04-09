@@ -34,9 +34,28 @@ public class TaskController {
     public ResponseEntity<List<TaskDTO.Response>> getAllTasks(
             @RequestParam(required = false) Task.Status status,
             @RequestParam(required = false) Task.Priority priority,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
             @AuthenticationPrincipal UserDetails userDetails) {
+
+        // If sorting or pagination params are present, use the new method
+        if (sortBy != null || page != null || size != null) {
+            return ResponseEntity.ok(
+                    taskService.getTasksWithSortAndPage(userDetails.getUsername(), sortBy, sortDir, page, size));
+        }
+
         return ResponseEntity.ok(
                 taskService.getAllTasks(userDetails.getUsername(), status, priority));
+    }
+
+    // GET /api/tasks/search — Search quests by title or description
+    @GetMapping("/search")
+    public ResponseEntity<List<TaskDTO.Response>> searchTasks(
+            @RequestParam String q,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(taskService.searchTasks(userDetails.getUsername(), q));
     }
 
     // GET /api/tasks/{id} — Get quest by ID
