@@ -11,4 +11,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
     Optional<User> findByResetToken(String resetToken);
+
+    // Get top users by XP for leaderboard
+    List<User> findTop10ByOrderByTotalXpDesc();
 }
