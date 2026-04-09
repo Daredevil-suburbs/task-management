@@ -176,7 +176,8 @@ task-management/
 
 | Method | Endpoint                 | Description                                |
 | ------ | ------------------------ | ------------------------------------------ |
-| GET    | /api/tasks               | Get all quests (filter by status/priority) |
+| GET    | /api/tasks               | Get all quests (filter by status/priority, sort, paginate) |
+| GET    | /api/tasks/search?q=     | Search quests by title/description         |
 | POST   | /api/tasks               | Create quest                               |
 | GET    | /api/tasks/{id}          | Get quest by ID                            |
 | PUT    | /api/tasks/{id}          | Update quest                               |
@@ -223,6 +224,26 @@ task-management/
 | ------ | -------------------------- | ------------------------------------------ |
 | GET    | /api/achievements          | All achievements with unlock status        |
 | GET    | /api/achievements/unlocked | Only the user's unlocked badges            |
+
+### Subtasks (JWT required)
+
+| Method | Endpoint                        | Description                           |
+| ------ | ------------------------------- | ------------------------------------- |
+| GET    | /api/tasks/{taskId}/subtasks    | Get all subtasks for a quest          |
+| POST   | /api/tasks/{taskId}/subtasks    | Create a subtask                      |
+| PUT    | /api/tasks/{taskId}/subtasks/{id} | Update a subtask                    |
+| PATCH  | /api/tasks/{taskId}/subtasks/{id}/toggle | Toggle subtask completion |
+| DELETE | /api/tasks/{taskId}/subtasks/{id} | Delete a subtask                    |
+
+### Profile (JWT required)
+
+| Method | Endpoint              | Description                           |
+| ------ | --------------------- | ------------------------------------- |
+| GET    | /api/user/profile     | Get user profile                      |
+| PUT    | /api/user/profile     | Update profile (name, password)       |
+| GET    | /api/user/streak      | Get current streak                    |
+| POST   | /api/user/password/reset-request | Request password reset (returns token) |
+| POST   | /api/user/password/reset-confirm | Confirm password reset with token     |
 
 ---
 
