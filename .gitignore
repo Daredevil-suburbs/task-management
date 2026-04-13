@@ -29,3 +29,4 @@ sync_script.ps1
 sync_script_restarted.ps1
 sync_v4_ordered.ps1
 app_start.log
+add_signatures.ps1
