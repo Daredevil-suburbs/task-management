@@ -24,7 +24,7 @@ def perform_eda(csv_path):
     
     # 3. Correlation Matrix
     print("\n--- Correlations (Target Variables) ---")
-    correlation_cols = ['mood', 'readiness', 'sleep_score', 'total_steps']
+    correlation_cols = ['mood', 'readiness', 'overall_score', 'steps']
     # filter only columns that exist
     cols_to_corr = [c for c in correlation_cols if c in df.columns]
     if len(cols_to_corr) > 1:
@@ -35,16 +35,16 @@ def perform_eda(csv_path):
     plt.figure(figsize=(12, 6))
     
     # Mood vs Steps
-    if 'mood' in df.columns and 'total_steps' in df.columns:
-        sns.scatterplot(data=df, x='total_steps', y='mood', alpha=0.5)
+    if 'mood' in df.columns and 'steps' in df.columns:
+        sns.scatterplot(data=df, x='steps', y='mood', alpha=0.5)
         plt.title('Mood vs. Daily Steps')
         plt.savefig(os.path.join('adhd-model-prep', 'mood_vs_steps.png'))
         print("Saved: mood_vs_steps.png")
 
-    # Mood vs Sleep Score
+    # Mood vs Overall Score (Sleep)
     plt.clf()
-    if 'mood' in df.columns and 'sleep_score' in df.columns:
-        sns.regplot(data=df, x='sleep_score', y='mood', scatter_kws={'alpha':0.5})
+    if 'mood' in df.columns and 'overall_score' in df.columns:
+        sns.regplot(data=df, x='overall_score', y='mood', scatter_kws={'alpha':0.5})
         plt.title('Mood vs. Sleep Score')
         plt.savefig(os.path.join('adhd-model-prep', 'mood_vs_sleep.png'))
         print("Saved: mood_vs_sleep.png")
