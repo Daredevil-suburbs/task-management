@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 import axios from 'axios'
 
 const api = axios.create({
