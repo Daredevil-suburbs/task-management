@@ -2,7 +2,6 @@ package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.dto.AchievementDTO;
 import com.example.taskmanagement.model.Achievement;
-import com.example.taskmanagement.model.Achievement.AchievementCategory;
 import com.example.taskmanagement.model.HunterRank;
 import com.example.taskmanagement.model.User;
 import com.example.taskmanagement.model.UserAchievement;
