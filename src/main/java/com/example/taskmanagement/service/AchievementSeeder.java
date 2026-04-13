@@ -6,17 +6,19 @@ import com.example.taskmanagement.repository.AchievementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Seeds the achievements table on startup with all badge definitions.
  * Idempotent — skips any achievement that already exists (by key).
- * Uses ContextRefreshedEvent to ensure JPA is fully initialized.
+ * Uses ApplicationReadyEvent to ensure JPA is fully initialized.
  */
 @Component
+@Profile("!test")
 public class AchievementSeeder {
 
     private static final Logger logger = LoggerFactory.getLogger(AchievementSeeder.class);
@@ -24,7 +26,7 @@ public class AchievementSeeder {
     @Autowired
     private AchievementRepository achievementRepository;
 
-    @EventListener(ContextRefreshedEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void seed() {
         // Only seed once
