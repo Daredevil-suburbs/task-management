@@ -24,6 +24,7 @@ C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\dto\UserStatusDTO.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\exception\GlobalExceptionHandler.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\exception\LoginLockedException.java
+C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\Fix.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\model\Achievement.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\model\Category.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\model\HealthRecord.java
@@ -60,4 +61,4 @@ C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\service\TagService.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\service\TaskService.java
 C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\service\UserService.java
-C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\TaskManagementApplication.java
+C:\Users\heyit\Desktop\task-management\src\main\java\com\example\taskmanagement\TaskManagementApp.java
