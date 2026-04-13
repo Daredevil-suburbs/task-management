@@ -6,25 +6,32 @@ import com.example.taskmanagement.repository.AchievementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Seeds the achievements table on startup with all badge definitions.
  * Idempotent — skips any achievement that already exists (by key).
+ * Uses ContextRefreshedEvent to ensure JPA is fully initialized.
  */
 @Component
-@Profile("!test")
-public class AchievementSeeder implements CommandLineRunner {
+public class AchievementSeeder {
 
     private static final Logger logger = LoggerFactory.getLogger(AchievementSeeder.class);
 
     @Autowired
     private AchievementRepository achievementRepository;
 
-    @Override
-    public void run(String... args) {
+    @EventListener(ContextRefreshedEvent.class)
+    @Transactional
+    public void seed() {
+        // Only seed once
+        if (achievementRepository.count() > 0) {
+            return;
+        }
+
         logger.info("🌱 Seeding achievements...");
         int created = 0;
 
@@ -68,12 +75,12 @@ public class AchievementSeeder implements CommandLineRunner {
         created += seedIfMissing("STREAK_30", "Monthly Machine",
                 "Maintain a 30-day completion streak", "⚡", AchievementCategory.STREAK);
 
-        logger.info("🌱 Achievement seeding complete — {} new, {} total",
-                created, achievementRepository.count());
+        logger.info("🌱 Achievement seeding complete — {} total", achievementRepository.count());
     }
 
     private int seedIfMissing(String key, String name, String description,
                                String icon, AchievementCategory category) {
+        // Redundant check because of if(count > 0) but good for safety
         if (achievementRepository.existsByKey(key)) return 0;
 
         Achievement a = new Achievement();
