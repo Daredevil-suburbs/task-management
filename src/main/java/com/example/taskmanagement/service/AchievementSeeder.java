@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,7 +75,7 @@ public class AchievementSeeder {
         created += seedIfMissing("STREAK_30", "Monthly Machine",
                 "Maintain a 30-day completion streak", "⚡", AchievementCategory.STREAK);
 
-        logger.info("🌱 Achievement seeding complete — {} total", achievementRepository.count());
+        logger.info("🌱 Achievement seeding complete — {} total seeded this run", created);
     }
 
     private int seedIfMissing(String key, String name, String description,
