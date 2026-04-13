@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 // The Hunter System - Component Exports
 // Gamified Task Management Components inspired by Solo Leveling
 
