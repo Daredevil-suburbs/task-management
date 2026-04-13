@@ -80,7 +80,7 @@ class TaskServiceTest {
         request.setXpReward(150);
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
-        when(taskRepository.save(any(Task.class))).thenReturn(testTask);
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         TaskDTO.Response response = taskService.createTask(request, "test@example.com");
@@ -144,7 +144,7 @@ class TaskServiceTest {
         assertEquals(Task.Status.DONE, response.getTask().getStatus());
         assertTrue(response.getXpEarned() > 0);
         verify(taskRepository, times(1)).save(any(Task.class));
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userService, times(1)).updateStreakOnQuestCompletion(any(User.class));
     }
 
     @Test
