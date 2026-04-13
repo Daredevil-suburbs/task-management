@@ -86,7 +86,7 @@ public class TaskService {
                                                            Integer page,
                                                            Integer size) {
         User user = getUser(email);
-        List<Task> tasks = taskRepository.findByUserId(user.getId());
+        List<Task> tasks = new ArrayList<>(taskRepository.findByUserId(user.getId()));
 
         // Apply sorting
         if (sortBy != null && !sortBy.isEmpty()) {
