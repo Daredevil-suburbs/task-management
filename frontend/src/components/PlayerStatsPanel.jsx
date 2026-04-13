@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 import React from 'react';
 import {
   TrendingUp,
