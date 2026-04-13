@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
