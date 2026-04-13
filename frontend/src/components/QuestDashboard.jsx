@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 import React, { useState } from 'react';
 import {
   Sword,
