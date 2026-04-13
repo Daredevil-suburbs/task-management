@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 package com.example.taskmanagement.config;
 
 import io.swagger.v3.oas.models.Components;
