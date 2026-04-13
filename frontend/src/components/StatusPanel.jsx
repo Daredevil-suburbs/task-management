@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 import { useEffect, useState } from 'react'
 import { userAPI } from '../services/api'
 import styles from './StatusPanel.module.css'
