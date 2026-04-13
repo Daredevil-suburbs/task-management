@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Plus, LogOut } from 'lucide-react';
