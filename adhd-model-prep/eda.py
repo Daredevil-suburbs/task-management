@@ -38,7 +38,7 @@ def perform_eda(csv_path):
     if 'mood' in df.columns and 'total_steps' in df.columns:
         sns.scatterplot(data=df, x='total_steps', y='mood', alpha=0.5)
         plt.title('Mood vs. Daily Steps')
-        plt.savefig('adhd-model-prep/mood_vs_steps.png')
+        plt.savefig(os.path.join('adhd-model-prep', 'mood_vs_steps.png'))
         print("Saved: mood_vs_steps.png")
 
     # Mood vs Sleep Score
@@ -46,7 +46,7 @@ def perform_eda(csv_path):
     if 'mood' in df.columns and 'sleep_score' in df.columns:
         sns.regplot(data=df, x='sleep_score', y='mood', scatter_kws={'alpha':0.5})
         plt.title('Mood vs. Sleep Score')
-        plt.savefig('adhd-model-prep/mood_vs_sleep.png')
+        plt.savefig(os.path.join('adhd-model-prep', 'mood_vs_sleep.png'))
         print("Saved: mood_vs_sleep.png")
 
     print("\nEDA complete!")
