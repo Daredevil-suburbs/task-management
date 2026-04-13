@@ -19,6 +19,7 @@
 
     <properties>
         <java.version>25</java.version>
+        <reload.ide>1</reload.ide>
     </properties>
 
     <dependencies>
