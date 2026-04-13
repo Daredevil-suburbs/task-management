@@ -3,6 +3,9 @@ package com.example.taskmanagement.service;
 import com.example.taskmanagement.model.Achievement;
 import com.example.taskmanagement.model.Achievement.AchievementCategory;
 import com.example.taskmanagement.repository.AchievementRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -11,15 +14,15 @@ import org.springframework.stereotype.Component;
  * Idempotent — skips any achievement that already exists (by key).
  */
 @Component
-public class AchievementSeeder {
+public class AchievementSeeder implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(AchievementSeeder.class);
 
     @Autowired
     private AchievementRepository achievementRepository;
 
-    @PostConstruct
-    public void seed() {
+    @Override
+    public void run(String... args) {
         logger.info("🌱 Seeding achievements...");
         int created = 0;
 
