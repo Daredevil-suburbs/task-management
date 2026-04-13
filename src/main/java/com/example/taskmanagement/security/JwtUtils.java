@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 package com.example.taskmanagement.security;
 
 import io.jsonwebtoken.*;
