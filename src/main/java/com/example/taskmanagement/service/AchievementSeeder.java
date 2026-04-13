@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
  * Uses ApplicationReadyEvent to ensure JPA is fully initialized.
  */
 @Component
-@Profile("!test")
 public class AchievementSeeder {
 
     private static final Logger logger = LoggerFactory.getLogger(AchievementSeeder.class);
