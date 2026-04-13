@@ -20,6 +20,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByUserIdAndPriority(Long userId, Task.Priority priority);
 
     Optional<Task> findByIdAndUserId(Long id, Long userId);
+    Optional<Task> findByIdAndUserEmail(Long id, String email);
 
     // Count completed tasks for a user (used in status panel)
     @Query("SELECT COUNT(t) FROM Task t WHERE t.user.id = :userId AND t.status = 'DONE'")
