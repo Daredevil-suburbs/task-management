@@ -23,7 +23,6 @@ com\example\taskmanagement\model\Achievement.class
 com\example\taskmanagement\repository\UserAchievementRepository.class
 com\example\taskmanagement\service\AchievementSeeder.class
 com\example\taskmanagement\service\LevelService$1.class
-com\example\taskmanagement\TaskManagementApplication.class
 com\example\taskmanagement\controller\TagController.class
 com\example\taskmanagement\dto\UserDTO$ProfileResponse.class
 com\example\taskmanagement\dto\TagDTO$Request.class
@@ -37,6 +36,7 @@ com\example\taskmanagement\repository\RecurringQuestRepository.class
 com\example\taskmanagement\dto\HealthDTO.class
 com\example\taskmanagement\dto\RecurringQuestDTO$Request.class
 com\example\taskmanagement\dto\SubtaskDTO.class
+com\example\taskmanagement\Fix.class
 com\example\taskmanagement\model\Tag.class
 com\example\taskmanagement\service\TaskService.class
 com\example\taskmanagement\config\RateLimitConfig.class
@@ -66,6 +66,7 @@ com\example\taskmanagement\model\Achievement$AchievementCategory.class
 com\example\taskmanagement\controller\UserController.class
 com\example\taskmanagement\config\RateLimitConfig$LoginAttemptService.class
 com\example\taskmanagement\dto\TaskDTO.class
+com\example\taskmanagement\TaskManagementApp.class
 com\example\taskmanagement\dto\TaskDTO$Response.class
 com\example\taskmanagement\dto\UserDTO.class
 com\example\taskmanagement\repository\HealthRecordRepository.class
