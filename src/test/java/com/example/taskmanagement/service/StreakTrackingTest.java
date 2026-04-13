@@ -2,7 +2,6 @@ package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.model.HunterRank;
 import com.example.taskmanagement.model.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
