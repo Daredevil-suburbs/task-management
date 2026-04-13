@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
+@SuppressWarnings("null")
 public class UserService {
 
     @Autowired private UserRepository userRepository;
