@@ -23,9 +23,8 @@ public class SubtaskService {
     private TaskRepository taskRepository;
 
     public List<SubtaskDTO.Response> getSubtasksByTaskId(Long taskId, String email) {
-        Task task = taskRepository.findByIdAndUserId(taskId,
-            taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found")).getUser().getId())
-            .orElseThrow(() -> new RuntimeException("Task not found"));
+        taskRepository.findByIdAndUserEmail(taskId, email)
+            .orElseThrow(() -> new RuntimeException("Task not found or unauthorized"));
 
         List<Subtask> subtasks = subtaskRepository.findByTaskId(taskId);
         return subtasks.stream().map(SubtaskDTO.Response::fromSubtask).collect(Collectors.toList());
@@ -33,9 +32,8 @@ public class SubtaskService {
 
     @Transactional
     public SubtaskDTO.Response createSubtask(Long taskId, SubtaskDTO.Request request, String email) {
-        Task task = taskRepository.findByIdAndUserId(taskId,
-            taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found")).getUser().getId())
-            .orElseThrow(() -> new RuntimeException("Task not found"));
+        Task task = taskRepository.findByIdAndUserEmail(taskId, email)
+            .orElseThrow(() -> new RuntimeException("Task not found or unauthorized"));
 
         Subtask subtask = new Subtask();
         subtask.setTitle(request.getTitle());
@@ -53,9 +51,8 @@ public class SubtaskService {
 
     @Transactional
     public SubtaskDTO.Response updateSubtask(Long taskId, Long subtaskId, SubtaskDTO.Request request, String email) {
-        Task task = taskRepository.findByIdAndUserId(taskId,
-            taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found")).getUser().getId())
-            .orElseThrow(() -> new RuntimeException("Task not found"));
+        taskRepository.findByIdAndUserEmail(taskId, email)
+            .orElseThrow(() -> new RuntimeException("Task not found or unauthorized"));
 
         Subtask subtask = subtaskRepository.findByIdAndTaskId(subtaskId, taskId)
             .orElseThrow(() -> new RuntimeException("Subtask not found"));
@@ -77,9 +74,8 @@ public class SubtaskService {
 
     @Transactional
     public void deleteSubtask(Long taskId, Long subtaskId, String email) {
-        Task task = taskRepository.findByIdAndUserId(taskId,
-            taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found")).getUser().getId())
-            .orElseThrow(() -> new RuntimeException("Task not found"));
+        taskRepository.findByIdAndUserEmail(taskId, email)
+            .orElseThrow(() -> new RuntimeException("Task not found or unauthorized"));
 
         Subtask subtask = subtaskRepository.findByIdAndTaskId(subtaskId, taskId)
             .orElseThrow(() -> new RuntimeException("Subtask not found"));
@@ -89,9 +85,8 @@ public class SubtaskService {
 
     @Transactional
     public SubtaskDTO.Response toggleSubtask(Long taskId, Long subtaskId, String email) {
-        Task task = taskRepository.findByIdAndUserId(taskId,
-            taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found")).getUser().getId())
-            .orElseThrow(() -> new RuntimeException("Task not found"));
+        taskRepository.findByIdAndUserEmail(taskId, email)
+            .orElseThrow(() -> new RuntimeException("Task not found or unauthorized"));
 
         Subtask subtask = subtaskRepository.findByIdAndTaskId(subtaskId, taskId)
             .orElseThrow(() -> new RuntimeException("Subtask not found"));
