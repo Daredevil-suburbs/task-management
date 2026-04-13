@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 package com.example.taskmanagement.model;
 
 import jakarta.persistence.*;
