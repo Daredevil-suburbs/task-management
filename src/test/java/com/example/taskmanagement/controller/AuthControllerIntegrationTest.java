@@ -1,12 +1,7 @@
 package com.example.taskmanagement.controller;
 
-import com.example.taskmanagement.config.RateLimitConfig;
 import com.example.taskmanagement.dto.AuthDTO;
-import com.example.taskmanagement.model.HunterRank;
-import com.example.taskmanagement.model.User;
 import com.example.taskmanagement.repository.UserRepository;
-import com.example.taskmanagement.security.JwtUtils;
-import com.example.taskmanagement.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +27,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
 class AuthControllerIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private UserRepository userRepository;
 
     @Test
     @DisplayName("POST /api/auth/register — success")
