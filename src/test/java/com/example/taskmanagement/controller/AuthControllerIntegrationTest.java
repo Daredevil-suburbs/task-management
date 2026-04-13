@@ -1,7 +1,6 @@
 package com.example.taskmanagement.controller;
 
 import com.example.taskmanagement.dto.AuthDTO;
-import com.example.taskmanagement.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
+@SuppressWarnings("null")
 class AuthControllerIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
