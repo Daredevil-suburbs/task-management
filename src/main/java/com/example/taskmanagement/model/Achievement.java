@@ -17,7 +17,7 @@ public class Achievement {
     private Long id;
 
     /** Unique machine key, e.g. "QUESTS_10", "RANK_B", "STREAK_7" */
-    @Column(nullable = false, unique = true)
+    @Column(name = "achievement_key", nullable = false, unique = true)
     private String key;
 
     /** Display name shown to users */
