@@ -42,15 +42,15 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 
 def process_and_save(input_csv, output_csv):
     if not os.path.exists(input_csv):
-        print(f"❌ Input file not found: {input_csv}")
+        print(f"Input file not found: {input_csv}")
         return
         
     df = pd.read_csv(input_csv)
     featured_df = engineer_features(df)
     
     featured_df.to_csv(output_csv, index=False)
-    print(f"✅ Feature engineering complete! Saved to {output_csv}")
-    print(f"📈 Resulting dataset size: {featured_df.shape}")
+    print(f"Feature engineering complete! Saved to {output_csv}")
+    print(f"Resulting dataset size: {featured_df.shape}")
 
 if __name__ == "__main__":
     process_and_save(

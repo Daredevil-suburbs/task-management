@@ -4,10 +4,10 @@ import seaborn as sns
 import os
 
 def perform_eda(csv_path):
-    print(f"🔍 Starting EDA on {csv_path}...")
+    print(f"Starting EDA on {csv_path}...")
     
     if not os.path.exists(csv_path):
-        print(f"❌ File not found: {csv_path}")
+        print(f"File not found: {csv_path}")
         return
 
     df = pd.read_csv(csv_path)
@@ -31,7 +31,7 @@ def perform_eda(csv_path):
         print(df[cols_to_corr].corr())
     
     # 4. Visualizations (Saving to artifacts folder)
-    print("\n📈 Generating Plots...")
+    print("\n--- Generating Plots ---")
     plt.figure(figsize=(12, 6))
     
     # Mood vs Steps
@@ -39,7 +39,7 @@ def perform_eda(csv_path):
         sns.scatterplot(data=df, x='total_steps', y='mood', alpha=0.5)
         plt.title('Mood vs. Daily Steps')
         plt.savefig('adhd-model-prep/mood_vs_steps.png')
-        print("✅ Saved: mood_vs_steps.png")
+        print("Saved: mood_vs_steps.png")
 
     # Mood vs Sleep Score
     plt.clf()
@@ -47,9 +47,9 @@ def perform_eda(csv_path):
         sns.regplot(data=df, x='sleep_score', y='mood', scatter_kws={'alpha':0.5})
         plt.title('Mood vs. Sleep Score')
         plt.savefig('adhd-model-prep/mood_vs_sleep.png')
-        print("✅ Saved: mood_vs_sleep.png")
+        print("Saved: mood_vs_sleep.png")
 
-    print("\n✨ EDA complete!")
+    print("\nEDA complete!")
 
 if __name__ == "__main__":
     perform_eda('adhd-model-prep/adhd_training_data_prepared.csv')
