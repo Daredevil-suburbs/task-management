@@ -2,7 +2,8 @@ package com.example.taskmanagement.controller;
 
 import com.example.taskmanagement.dto.AuthDTO;
 import com.example.taskmanagement.dto.TaskDTO;
-import com.example.taskmanagement.model.Task;
+import com.example.taskmanagement.model.Achievement;
+import com.example.taskmanagement.repository.AchievementRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,10 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
+@DirtiesContext
 class TaskControllerIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
+    @Autowired private AchievementRepository achievementRepository;
 
     private String jwtToken;
 
@@ -51,6 +55,15 @@ class TaskControllerIntegrationTest {
         AuthDTO.AuthResponse authResponse = objectMapper.readValue(
                 result.getResponse().getContentAsString(), AuthDTO.AuthResponse.class);
         jwtToken = authResponse.getToken();
+
+        // Seed basic achievements for tests
+        if (achievementRepository.count() == 0) {
+            Achievement a = new Achievement();
+            a.setKey("FIRST_QUEST");
+            a.setName("First Blood");
+            a.setCategory(Achievement.AchievementCategory.QUEST);
+            achievementRepository.save(a);
+        }
     }
 
     @Test
