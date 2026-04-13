@@ -1,3 +1,6 @@
+/** 
+ * @author Daredevil-suburbs
+ */
 import { useEffect, useState } from 'react'
 import { questAPI } from '../services/api'
 import QuestCard from './QuestCard'
