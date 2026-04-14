@@ -13,6 +13,20 @@ node_modules/
 dist/
 .env
 
+# Claude
+.claude/
+.claudeignore
+
+#.vscode
+.vscode/
+.vscodeignore
+
+
+#.agent
+.agent/
+.agentignore
+
+
 # Expo
 .expo/
 
