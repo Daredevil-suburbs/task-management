@@ -3,11 +3,13 @@
  */
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Plus, LogOut } from 'lucide-react';
+import { Plus, LogOut, Sword } from 'lucide-react';
 import { QuestDashboard, AddQuestModal, PlayerStatsPanel, HealthSyncDashboard } from '../components';
+import { useNavigate } from 'react-router-dom';
 
 export default function HunterDashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activePanel, setActivePanel] = useState('quests');
 
@@ -38,14 +40,11 @@ export default function HunterDashboard() {
             {/* Navigation Tabs */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setActivePanel('quests')}
-                className={`px-4 py-2 rounded-lg font-bold uppercase tracking-wide text-sm transition-all ${
-                  activePanel === 'quests'
-                    ? 'bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
-                }`}
+                onClick={() => navigate('/quests')}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-bold uppercase tracking-wide text-sm transition-all bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)] hover:shadow-[0_0_25px_rgba(59,130,246,0.7)]"
               >
-                Quests
+                <Sword className="w-4 h-4" />
+                Quest Board
               </button>
               <button
                 onClick={() => setActivePanel('stats')}
@@ -93,12 +92,6 @@ export default function HunterDashboard() {
 
       {/* Main Content */}
       <main className="max-w-[1600px] mx-auto px-6 py-8">
-        {activePanel === 'quests' && (
-          <div className="space-y-6">
-            <PlayerStatsPanel />
-            <QuestDashboard />
-          </div>
-        )}
         {activePanel === 'stats' && <PlayerStatsPanel />}
         {activePanel === 'health' && <HealthSyncDashboard />}
       </main>
