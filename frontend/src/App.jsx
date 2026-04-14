@@ -7,6 +7,7 @@ import LoginPage    from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import HunterDashboard from './pages/HunterDashboard'
+import MainQuestBoard from './pages/MainQuestBoard'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -44,6 +45,9 @@ export default function App() {
           } />
           <Route path="/hunter" element={
             <ProtectedRoute><HunterDashboard /></ProtectedRoute>
+          } />
+          <Route path="/quests" element={
+            <ProtectedRoute><MainQuestBoard /></ProtectedRoute>
           } />
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
