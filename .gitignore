@@ -1,8 +1,12 @@
+# Java / Spring Boot
 target/
 *.class
-*.log
 *.jar
 *.war
+*.log
+pom.xml.tag
+
+# IDE
 .idea/
 *.iml
 .vscode/
@@ -12,35 +16,18 @@ target/
 node_modules/
 dist/
 .env
+.env.local
 
-# Claude
-.claude/
-.claudeignore
-
-#.vscode
-.vscode/
-.vscodeignore
-
-
-#.agent
-.agent/
-.agentignore
-
-
-# Expo
+# Expo / React Native
 .expo/
+*.jks
+*.keystore
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Scripts
-sync_v3.ps1
-sync_latest.ps1
-sync_one_by_one.ps1
-sync_script.ps1
-sync_script_restarted.ps1
-sync_v4_ordered.ps1
-app_start.log
-add_signatures.ps1
+# Build artifacts
+build/
+*.orig
