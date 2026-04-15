@@ -1,16 +1,52 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Shield, Zap } from "lucide-react"
+import { fetchUserStatus, type UserStatus } from "@/lib/api"
 
 interface HeaderProps {
   sidebarCollapsed?: boolean
 }
 
 export function Header({ sidebarCollapsed }: HeaderProps) {
-  const currentXP = 2450
-  const maxXP = 4000
-  const xpPercentage = (currentXP / maxXP) * 100
+  const [status, setStatus] = useState<UserStatus | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadStatus() {
+      try {
+        const data = await fetchUserStatus()
+        if (!cancelled) setStatus(data)
+      } catch (err) {
+        console.error("Failed to fetch user status:", err)
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    }
+
+    loadStatus()
+
+    // Poll every 30s to keep XP/level fresh
+    const interval = setInterval(loadStatus, 30000)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [])
+
+  // Derive XP bar values
+  const currentXP = status?.totalXp ?? 0
+  const level = status?.level ?? 1
+  const xpToNext = status?.xpToNextLevel ?? 100
+  // XP within the current level: each level = 100 XP (from HunterRank.levelFromXp)
+  const xpInLevel = currentXP % 100
+  const maxXPInLevel = 100
+  const xpPercentage = (xpInLevel / maxXPInLevel) * 100
+
+  const hunterRank = status?.hunterRank ?? "E Rank"
 
   return (
     <header
@@ -40,9 +76,13 @@ export function Header({ sidebarCollapsed }: HeaderProps) {
               <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
                 Hunter Rank
               </div>
-              <div className="text-sm font-bold text-primary uppercase tracking-wide">
-                Rank C
-              </div>
+              {isLoading ? (
+                <div className="h-4 w-14 rounded bg-white/5 animate-pulse mt-0.5" />
+              ) : (
+                <div className="text-sm font-bold text-primary uppercase tracking-wide">
+                  {hunterRank}
+                </div>
+              )}
             </div>
           </div>
 
@@ -55,7 +95,11 @@ export function Header({ sidebarCollapsed }: HeaderProps) {
               <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
                 Level
               </div>
-              <div className="text-sm font-bold text-foreground">14</div>
+              {isLoading ? (
+                <div className="h-4 w-6 rounded bg-white/5 animate-pulse mt-0.5" />
+              ) : (
+                <div className="text-sm font-bold text-foreground">{level}</div>
+              )}
             </div>
           </div>
 
@@ -65,20 +109,24 @@ export function Header({ sidebarCollapsed }: HeaderProps) {
               <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
                 Experience
               </span>
-              <span className="text-xs text-primary font-medium">
-                {currentXP.toLocaleString()} / {maxXP.toLocaleString()} XP
-              </span>
+              {isLoading ? (
+                <div className="h-3 w-24 rounded bg-white/5 animate-pulse" />
+              ) : (
+                <span className="text-xs text-primary font-medium">
+                  {currentXP.toLocaleString()} XP (Lv {level})
+                </span>
+              )}
             </div>
             <div className="relative h-2 bg-zinc-900 rounded-full overflow-hidden border border-white/5">
               {/* Glow effect */}
               <div
                 className="absolute inset-y-0 left-0 bg-primary/30 blur-sm transition-all duration-500"
-                style={{ width: `${xpPercentage}%` }}
+                style={{ width: `${isLoading ? 0 : xpPercentage}%` }}
               />
               {/* Actual bar */}
               <div
                 className="relative h-full bg-gradient-to-r from-primary to-blue-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(59,130,246,0.6)]"
-                style={{ width: `${xpPercentage}%` }}
+                style={{ width: `${isLoading ? 0 : xpPercentage}%` }}
               />
             </div>
           </div>

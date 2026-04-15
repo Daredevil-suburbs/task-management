@@ -1,17 +1,27 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
 import { QuestBoard } from "@/components/quest-board"
 import { cn } from "@/lib/utils"
+import { getToken } from "@/lib/api"
 
 export default function HunterDashboard() {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState("quest-board")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // Auth guard: redirect to login if no token
+    const token = getToken()
+    if (!token) {
+      router.replace("/login")
+      return
+    }
+
     setMounted(true)
     const handleResize = () => {
       // Listen for sidebar state changes via storage event or just detect width
