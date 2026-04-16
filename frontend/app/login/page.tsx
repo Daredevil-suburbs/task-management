@@ -92,12 +92,13 @@ export default function LoginPage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your name"
                   required
+                  suppressHydrationWarning
                   className="w-full px-4 py-3 rounded-lg bg-zinc-800/50 border border-white/5 text-sm text-foreground placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all"
                 />
               </div>
             )}
 
-            <div>
+            <div suppressHydrationWarning>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
                 Email
               </label>
@@ -107,6 +108,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="hunter@example.com"
                 required
+                suppressHydrationWarning
                 className="w-full px-4 py-3 rounded-lg bg-zinc-800/50 border border-white/5 text-sm text-foreground placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all"
               />
             </div>
@@ -115,13 +117,14 @@ export default function LoginPage() {
               <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
                 Password
               </label>
-              <div className="relative">
+              <div className="relative" suppressHydrationWarning>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  suppressHydrationWarning
                   className="w-full px-4 py-3 rounded-lg bg-zinc-800/50 border border-white/5 text-sm text-foreground placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all pr-12"
                 />
                 <button
