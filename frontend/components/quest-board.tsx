@@ -9,6 +9,7 @@ import {
   type TaskResponse,
   type CompleteResponse,
 } from "@/lib/api"
+import { CreateQuestModal } from "./create-quest-modal"
 
 // ─── Map API response → Quest shape used by QuestCard ────────────────
 
@@ -184,6 +185,7 @@ export function QuestBoard() {
   const [error, setError] = useState<string | null>(null)
   const [completingId, setCompletingId] = useState<string | null>(null)
   const [rankUpData, setRankUpData] = useState<CompleteResponse | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   // Fetch quests from backend
   const loadQuests = useCallback(async () => {
@@ -306,7 +308,10 @@ export function QuestBoard() {
         ))}
 
         {/* Add Quest Card */}
-        <button className="group flex flex-col items-center justify-center min-h-[180px] rounded-lg border border-dashed border-white/10 bg-zinc-900/30 transition-all duration-300 hover:border-primary/40 hover:bg-zinc-900/50">
+        <button 
+          onClick={() => setIsCreateModalOpen(true)}
+          className="group flex flex-col items-center justify-center min-h-[180px] rounded-lg border border-dashed border-white/10 bg-zinc-900/30 transition-all duration-300 hover:border-primary/40 hover:bg-zinc-900/50"
+        >
           <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
             <Plus className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
@@ -315,6 +320,12 @@ export function QuestBoard() {
           </span>
         </button>
       </div>
+
+      <CreateQuestModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={loadQuests}
+      />
 
       {/* Rank-Up / XP Toast */}
       {rankUpData && (
