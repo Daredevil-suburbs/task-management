@@ -18,6 +18,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
+            "http://localhost:3000",   // Next.js dev server
             "http://localhost:5173",   // Vite dev server
             "http://localhost:4173",   // Vite preview
             "http://localhost:8081",   // Expo Metro server (web)
