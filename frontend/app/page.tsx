@@ -1,27 +1,19 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
 import { QuestBoard } from "@/components/quest-board"
+import { SystemGuideChat } from "@/components/system-guide-chat"
+import { SystemInsightPanel } from "@/components/system-insight-panel"
 import { cn } from "@/lib/utils"
-import { getToken } from "@/lib/api"
 
 export default function HunterDashboard() {
-  const router = useRouter()
   const [activeTab, setActiveTab] = useState("quest-board")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // Auth guard: redirect to login if no token
-    const token = getToken()
-    if (!token) {
-      router.replace("/login")
-      return
-    }
-
     setMounted(true)
     const handleResize = () => {
       // Listen for sidebar state changes via storage event or just detect width
@@ -78,19 +70,7 @@ export default function HunterDashboard() {
         <div className="max-w-7xl mx-auto">
           {activeTab === "quest-board" && <QuestBoard />}
           
-          {activeTab === "daily-grinds" && (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-              <div className="w-20 h-20 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center mb-4">
-                <span className="text-3xl">🔥</span>
-              </div>
-              <h2 className="text-lg font-bold uppercase tracking-widest text-foreground mb-2">
-                Daily Grinds
-              </h2>
-              <p className="text-sm text-muted-foreground max-w-md">
-                Your daily habit streaks will appear here. Complete recurring quests to build your power.
-              </p>
-            </div>
-          )}
+          {activeTab === "daily-grinds" && <SystemInsightPanel />}
 
           {activeTab === "health-stats" && (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
@@ -121,6 +101,9 @@ export default function HunterDashboard() {
           )}
         </div>
       </main>
+
+      {/* System Guide Chat */}
+      <SystemGuideChat />
     </div>
   )
 }
