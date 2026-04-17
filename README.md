@@ -5,6 +5,26 @@
 
 ---
 
+## 📸 Visual Showcase
+
+### 🛡️ Dashboard (Quest Board)
+The central hub for all your missions. Track your XP, Level, and Hunter Rank in real-time.
+![Dashboard](docs/screenshots/dashboard.png)
+
+### ⌨️ Hunter Registration
+Initialize your system and choose your class.
+![Registration](docs/screenshots/registration.png)
+
+### 🏹 Quest Creation
+Register new missions with priority-based XP rewards.
+![New Quest](docs/screenshots/new_quest.png)
+
+### 🔐 Secure Access
+JWT-protected authentication flow.
+![Login](docs/screenshots/login.png)
+
+---
+
 ## 🚀 Tech Stack
 
 | Layer      | Technology                       |
