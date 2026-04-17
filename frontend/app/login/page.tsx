@@ -2,176 +2,206 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { login, register } from "@/lib/api"
-import { Swords, Eye, EyeOff, Loader2 } from "lucide-react"
+import { login, register, setToken } from "@/lib/api"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Zap, Shield, Flame } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
-  const [isRegister, setIsRegister] = useState(false)
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setIsLoading(true)
+  // Login form state
+  const [loginEmail, setLoginEmail] = useState("")
+  const [loginPassword, setLoginPassword] = useState("")
 
+  // Register form state
+  const [regName, setRegName] = useState("")
+  const [regEmail, setRegEmail] = useState("")
+  const [regPassword, setRegPassword] = useState("")
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
     try {
-      if (isRegister) {
-        await register(name, email, password)
-      } else {
-        await login(email, password)
-      }
+      const res = await login(loginEmail, loginPassword)
+      setToken(res.token)
       router.push("/")
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Authentication failed"
-      // Clean up API error messages for display
-      if (message.includes("401") || message.includes("403")) {
-        setError("Invalid email or password")
-      } else if (message.includes("409") || message.includes("already")) {
-        setError("An account with this email already exists")
-      } else {
-        setError(message)
-      }
+    } catch (err: any) {
+      setError(err.message || "Invalid credentials")
     } finally {
-      setIsLoading(false)
+      setLoading(false)
+    }
+  }
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await register(regName, regEmail, regPassword)
+      setToken(res.token)
+      router.push("/awakening")
+    } catch (err: any) {
+      setError(err.message || "Registration failed")
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/3 rounded-full blur-3xl" />
-      </div>
-
-      {/* Login Card */}
-      <div className="relative w-full max-w-md mx-4">
-        {/* Outer glow */}
-        <div className="absolute -inset-1 bg-primary/10 rounded-2xl blur-xl" />
-
-        <div className="relative rounded-xl border border-white/5 bg-zinc-900/80 backdrop-blur-xl p-8 shadow-2xl">
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="relative mb-4">
-              <div className="absolute inset-0 bg-primary/30 blur-lg rounded-full" />
-              <div className="relative w-16 h-16 rounded-full bg-zinc-900 border-2 border-primary flex items-center justify-center shadow-[0_0_25px_rgba(59,130,246,0.4)]">
-                <Swords className="w-8 h-8 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-              </div>
-            </div>
-            <h1 className="text-xl font-bold uppercase tracking-[0.3em] text-foreground">
-              Hunter System
-            </h1>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider mt-1">
-              {isRegister ? "Create Your Hunter ID" : "Authenticate to Continue"}
-            </p>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#070707] relative overflow-hidden">
+      {/* Background aesthetics */}
+      <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
+      <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] animate-pulse duration-700" />
+      
+      <div className="z-10 w-full max-w-md px-4">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-primary to-blue-600 flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.5)] mb-4">
+            <Zap className="w-10 h-10 text-white fill-white" />
           </div>
-
-          {/* Error */}
-          {error && (
-            <div className="mb-4 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-medium">
-              ⚠️ {error}
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {isRegister && (
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                  Hunter Name
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
-                  required
-                  suppressHydrationWarning
-                  className="w-full px-4 py-3 rounded-lg bg-zinc-800/50 border border-white/5 text-sm text-foreground placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all"
-                />
-              </div>
-            )}
-
-            <div suppressHydrationWarning>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="hunter@example.com"
-                required
-                suppressHydrationWarning
-                className="w-full px-4 py-3 rounded-lg bg-zinc-800/50 border border-white/5 text-sm text-foreground placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                Password
-              </label>
-              <div className="relative" suppressHydrationWarning>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  suppressHydrationWarning
-                  className="w-full px-4 py-3 rounded-lg bg-zinc-800/50 border border-white/5 text-sm text-foreground placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all pr-12"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all duration-200"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {isRegister ? "Creating Account..." : "Authenticating..."}
-                </>
-              ) : (
-                isRegister ? "Register" : "Login"
-              )}
-            </button>
-          </form>
-
-          {/* Toggle */}
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsRegister(!isRegister)
-                setError(null)
-              }}
-              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider"
-            >
-              {isRegister
-                ? "Already a hunter? Login"
-                : "New hunter? Create account"}
-            </button>
-          </div>
+          <h1 className="text-3xl font-black italic tracking-tighter text-white uppercase">
+            Hunter <span className="text-primary underline decoration-2 underline-offset-4">System</span>
+          </h1>
+          <p className="text-zinc-500 text-sm mt-2 uppercase tracking-[0.2em] font-medium">Level up your life</p>
         </div>
+
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-zinc-900/50 border border-white/5 p-1 rounded-xl mb-6">
+            <TabsTrigger value="login" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300">
+              Login
+            </TabsTrigger>
+            <TabsTrigger value="register" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300">
+              Awaken
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="login">
+            <Card className="bg-zinc-900/40 border-white/10 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden">
+              <form onSubmit={handleLogin}>
+                <CardHeader>
+                  <CardTitle className="text-xl text-white font-bold flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-primary" /> Authenticate
+                  </CardTitle>
+                  <CardDescription className="text-zinc-400">Enter your credentials to access the system.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {error && (
+                    <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-300">
+                      ⚠️ {error}
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-zinc-400">Email Address</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="hunter@leveling.com" 
+                      className="bg-zinc-950/50 border-white/10 focus:border-primary/50 text-white h-11"
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password" id="password-label" className="text-xs font-bold uppercase tracking-wider text-zinc-400">Password</Label>
+                    <Input 
+                      id="password" 
+                      type="password" 
+                      placeholder="••••••••" 
+                      className="bg-zinc-950/50 border-white/10 focus:border-primary/50 text-white h-11"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest h-11 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all active:scale-95"
+                    disabled={loading}
+                  >
+                    {loading ? "Authenticating..." : "Login"}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="register">
+            <Card className="bg-zinc-900/40 border-white/10 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden">
+              <form onSubmit={handleRegister}>
+                <CardHeader>
+                  <CardTitle className="text-xl text-white font-bold flex items-center gap-2">
+                    <Flame className="w-5 h-5 text-orange-500" /> New Awakening
+                  </CardTitle>
+                  <CardDescription className="text-zinc-400">Register as a new Hunter to start your journey.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {error && (
+                    <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium animate-in fade-in slide-in-from-top-2 duration-300">
+                      ⚠️ {error}
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-zinc-400">Hunter Name</Label>
+                    <Input 
+                      id="name" 
+                      placeholder="Sung Jin-Woo" 
+                      className="bg-zinc-950/50 border-white/10 focus:border-primary/50 text-white h-11"
+                      value={regName}
+                      onChange={(e) => setRegName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="reg-email" className="text-xs font-bold uppercase tracking-wider text-zinc-400">Email Address</Label>
+                    <Input 
+                      id="reg-email" 
+                      type="email" 
+                      placeholder="shadowmonarch@system.com" 
+                      className="bg-zinc-950/50 border-white/10 focus:border-primary/50 text-white h-11"
+                      value={regEmail}
+                      onChange={(e) => setRegEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="reg-password" className="text-xs font-bold uppercase tracking-wider text-zinc-400">Access Key (Password)</Label>
+                    <Input 
+                      id="reg-password" 
+                      type="password" 
+                      placeholder="••••••••" 
+                      className="bg-zinc-950/50 border-white/10 focus:border-primary/50 text-white h-11"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest h-11 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all active:scale-95"
+                    disabled={loading}
+                  >
+                    {loading ? "Awakening..." : "Create Account"}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        <p className="text-center text-zinc-600 text-[10px] mt-12 uppercase tracking-widest font-bold">
+          Authorized personnel only • System version 2.4.1
+        </p>
       </div>
     </div>
   )
