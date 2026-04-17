@@ -24,6 +24,8 @@ import java.util.List;
 @SuppressWarnings("null")
 public class OnboardingService {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(OnboardingService.class);
+
     @Autowired
     private TaskRepository taskRepository;
 
@@ -72,59 +74,43 @@ public class OnboardingService {
     }
 
     /**
-     * Simulates an HTTP call to a local LLM API (Ollama/Claude).
-     * In production, this would make an actual HTTP request.
+     * Makes an HTTP POST request to the local Ollama instance.
      */
     public String callOllamaModel(String prompt) {
-        // TODO: Replace with actual HTTP call to your local LLM
-        // Example for Ollama:
-        // HttpClient client = HttpClient.newHttpClient();
-        // HttpRequest request = HttpRequest.newBuilder()
-        //     .uri(URI.create("http://localhost:11434/api/generate"))
-        //     .header("Content-Type", "application/json")
-        //     .POST(HttpRequest.BodyPublishers.ofString(
-        //         "{\"model\": \"llama3.2\", \"prompt\": \"" + prompt + "\", \"stream\": false}"
-        //     ))
-        //     .build();
-        // HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        // return response.body();
+        logger.info("Calling Ollama with prompt: {}", prompt);
+        try {
+            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+            
+            java.util.Map<String, Object> bodyMap = new java.util.HashMap<>();
+            bodyMap.put("model", "qwen3.5:latest");
+            bodyMap.put("prompt", prompt);
+            bodyMap.put("stream", false);
+            
+            String jsonBody = objectMapper.writeValueAsString(bodyMap);
 
-        // SIMULATED RESPONSE for development/testing
-        // This mimics what a real LLM would return
-        return """
-            [
-              {
-                "title": "Set Up Your Task Management System",
-                "description": "Create your account, explore the interface, and set up your first category for organizing tasks.",
-                "priority": "HIGH",
-                "isMilestone": false
-              },
-              {
-                "title": "Complete One Small Task Today",
-                "description": "Pick one simple task you can finish in under 30 minutes and mark it as done. Experience the satisfaction of completion!",
-                "priority": "HIGH",
-                "isMilestone": false
-              },
-              {
-                "title": "Review and Plan Tomorrow's Tasks",
-                "description": "Spend 10 minutes each evening reviewing what you accomplished and writing down 2-3 tasks for tomorrow.",
-                "priority": "MEDIUM",
-                "isMilestone": false
-              },
-              {
-                "title": "Complete Your First Week Streak",
-                "description": "Complete at least one task every day for 7 consecutive days. Build the habit of daily progress!",
-                "priority": "HIGH",
-                "isMilestone": true
-              },
-              {
-                "title": "Reach Level 5 Hunter Rank",
-                "description": "Accumulate enough XP by completing tasks to advance from E-rank to D-rank hunter. This shows you've built consistent habits.",
-                "priority": "MEDIUM",
-                "isMilestone": true
-              }
-            ]
-            """;
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create("http://localhost:11434/api/generate"))
+                .header("Content-Type", "application/json")
+                .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, 
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                logger.error("Ollama error: status {} body {}", response.statusCode(), response.body());
+                throw new RuntimeException("Ollama API error: " + response.statusCode());
+            }
+
+            com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response.body());
+            String out = root.get("response").asText();
+            logger.info("Ollama response: {}", out);
+            return out;
+
+        } catch (Exception e) {
+            logger.error("Critical error calling Ollama model: {}", e.getMessage(), e);
+            throw new RuntimeException("AI Model Error: " + e.getMessage());
+        }
     }
 
     /**
@@ -132,9 +118,24 @@ public class OnboardingService {
      */
     public List<OnboardingDTO.LlmTask> parseLlmResponse(String jsonResponse) {
         try {
-            return objectMapper.readValue(jsonResponse.trim(), new TypeReference<List<OnboardingDTO.LlmTask>>() {});
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to parse LLM response: " + e.getMessage(), e);
+            // Robust cleaning of the response — sometimes models wrap in backticks or preamble
+            String cleanJson = jsonResponse.trim();
+            if (cleanJson.contains("```json")) {
+                cleanJson = cleanJson.substring(cleanJson.indexOf("```json") + 7);
+                if (cleanJson.contains("```")) {
+                    cleanJson = cleanJson.substring(0, cleanJson.indexOf("```"));
+                }
+            } else if (cleanJson.contains("```")) {
+                 cleanJson = cleanJson.substring(cleanJson.indexOf("```") + 3);
+                 if (cleanJson.contains("```")) {
+                    cleanJson = cleanJson.substring(0, cleanJson.indexOf("```"));
+                }
+            }
+            
+            return objectMapper.readValue(cleanJson.trim(), new TypeReference<List<OnboardingDTO.LlmTask>>() {});
+        } catch (Exception e) {
+            logger.error("Failed to parse AI response: {}", jsonResponse);
+            throw new RuntimeException("Failed to decode AI response: " + e.getMessage(), e);
         }
     }
 
@@ -163,7 +164,15 @@ public class OnboardingService {
             Task task = new Task();
             task.setTitle(llmTask.getTitle());
             task.setDescription(llmTask.getDescription());
-            task.setPriority(Task.Priority.valueOf(llmTask.getPriority()));
+            
+            // Robust priority parsing
+            try {
+                task.setPriority(Task.Priority.valueOf(llmTask.getPriority().toUpperCase()));
+            } catch (Exception e) {
+                logger.warn("Received invalid priority '{}' from AI, defaulting to MEDIUM", llmTask.getPriority());
+                task.setPriority(Task.Priority.MEDIUM);
+            }
+            
             task.setStatus(Task.Status.TODO);
             task.setXpReward(determineXpReward(llmTask.getPriority()));
             task.setDueDate(LocalDate.now().plusDays(7)); // Default due date
