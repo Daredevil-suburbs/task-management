@@ -31,9 +31,12 @@ import java.util.stream.Collectors;
 @SuppressWarnings("null")
 public class AiCoachingService {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AiCoachingService.class);
+
     @Autowired private DailyLogRepository dailyLogRepo;
     @Autowired private TaskRepository taskRepo;
     @Autowired private UserRepository userRepo;
+    @Autowired private com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     /**
      * Analyze the Hunter's recent data and produce a tactical recommendation.
@@ -103,45 +106,40 @@ public class AiCoachingService {
         );
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    //  LLM API Call (simulated)
-    // ═══════════════════════════════════════════════════════════════════════
-
     /**
-     * Simulates an HTTP POST request to a local Ollama instance or Claude API.
-     * In production, replace this with an actual HTTP call.
-     *
-     * Example Ollama integration:
-     * <pre>
-     *   HttpClient client = HttpClient.newHttpClient();
-     *   HttpRequest request = HttpRequest.newBuilder()
-     *       .uri(URI.create("http://localhost:11434/api/generate"))
-     *       .header("Content-Type", "application/json")
-     *       .POST(HttpRequest.BodyPublishers.ofString(
-     *           "{\"model\": \"llama3.2\", \"prompt\": \"" + prompt + "\", \"stream\": false}"
-     *       ))
-     *       .build();
-     *   HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-     *   return parseOllamaResponse(response.body());
-     * </pre>
-     *
-     * Example Claude API integration:
-     * <pre>
-     *   HttpRequest request = HttpRequest.newBuilder()
-     *       .uri(URI.create("https://api.anthropic.com/v1/messages"))
-     *       .header("x-api-key", CLAUDE_API_KEY)
-     *       .header("anthropic-version", "2023-06-01")
-     *       .header("Content-Type", "application/json")
-     *       .POST(HttpRequest.BodyPublishers.ofString(buildClaudePayload(prompt)))
-     *       .build();
-     * </pre>
+     * Makes an HTTP POST request to the local Ollama instance.
      */
     public String callLlmApi(String prompt) {
-        // SIMULATED RESPONSE for development/testing.
-        // This mimics what a real LLM System Guide would return.
-        return "Predicted focus level: 6/10 — your sleep has been inconsistent and " +
-               "medication compliance is irregular. Prioritize your two highest-priority " +
-               "quests in the first 90 minutes of your day while your mental clarity peaks, " +
-               "then switch to low-effort administrative tasks after noon.";
+        logger.info("Calling System Guide AI with prompt...");
+        try {
+            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+            
+            java.util.Map<String, Object> bodyMap = new java.util.HashMap<>();
+            bodyMap.put("model", "qwen3.5:latest");
+            bodyMap.put("prompt", prompt);
+            bodyMap.put("stream", false);
+            
+            String jsonBody = objectMapper.writeValueAsString(bodyMap);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create("http://localhost:11434/api/generate"))
+                .header("Content-Type", "application/json")
+                .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, 
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Ollama API error: " + response.statusCode());
+            }
+
+            com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response.body());
+            return root.get("response").asText();
+
+        } catch (Exception e) {
+            logger.error("Error calling System Guide AI: {}", e.getMessage());
+            return "Unable to access the System Guide at this time. Focus on your immediate quests.";
+        }
     }
 }
