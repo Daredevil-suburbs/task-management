@@ -12,6 +12,7 @@ export default function HunterDashboard() {
   const [activeTab, setActiveTab] = useState("quest-board")
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     setMounted(true)
@@ -45,6 +46,10 @@ export default function HunterDashboard() {
     return null
   }
 
+  const handleQuestCompleted = () => {
+    setRefreshKey((prev) => prev + 1)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Background Effects */}
@@ -58,7 +63,7 @@ export default function HunterDashboard() {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Header */}
-      <Header sidebarCollapsed={sidebarCollapsed} />
+      <Header sidebarCollapsed={sidebarCollapsed} refreshKey={refreshKey} />
 
       {/* Main Content */}
       <main
@@ -68,7 +73,9 @@ export default function HunterDashboard() {
         )}
       >
         <div className="max-w-7xl mx-auto">
-          {activeTab === "quest-board" && <QuestBoard />}
+          {activeTab === "quest-board" && (
+            <QuestBoard onQuestCompleted={handleQuestCompleted} />
+          )}
           
           {activeTab === "daily-grinds" && <SystemInsightPanel />}
 
