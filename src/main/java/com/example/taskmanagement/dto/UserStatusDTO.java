@@ -29,7 +29,7 @@ public class UserStatusDTO {
         dto.xpToNextLevel = xpToNextLevel;
         dto.xpToNextRank = xpToNextRank;
         dto.tasksCompleted = tasksCompleted;
-        dto.maxRank = user.getHunterRank() == HunterRank.S;
+        dto.maxRank = user.getHunterRank() == HunterRank.A;
         return dto;
     }
 

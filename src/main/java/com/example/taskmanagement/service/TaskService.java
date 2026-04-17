@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -174,17 +175,21 @@ public class TaskService {
         // Snapshot rank before awarding XP
         HunterRank rankBefore = user.getHunterRank();
 
-        // Calculate XP earned (priority multiplier applied inside LevelService)
+        // Calculate XP earned using dynamic formula:
+        // Base XP × Priority Multiplier × Deadline Multiplier
         int baseXp = task.getXpReward();
-        int xpEarned = calculateEarned(baseXp, task.getPriority());
+        LocalDate dueDate = task.getDueDate();
+        LocalDate completedAt = LocalDate.now();
+
+        int xpEarned = levelService.calculateDynamicXp(baseXp, task.getPriority(), dueDate, completedAt);
 
         // Mark task done
         task.setStatus(Task.Status.DONE);
         task.setCompletedAt(LocalDateTime.now());
         taskRepository.save(task);
 
-        // Award XP → mutates user fields in place
-        levelService.awardXp(user, baseXp, task.getPriority());
+        // Award XP with dynamic calculation → mutates user fields in place
+        levelService.awardXp(user, baseXp, task.getPriority(), dueDate, completedAt);
 
         // Update streak
         userService.updateStreakOnQuestCompletion(user);
@@ -193,18 +198,19 @@ public class TaskService {
         List<AchievementDTO.UnlockNotification> newAchievements =
                 achievementService.checkAndAward(user);
 
-        // Build response
+        // Check for rank up and trigger event if applicable
+        boolean rankUpOccurred = userService.checkRankUp(user, rankBefore);
         HunterRank rankAfter = user.getHunterRank();
-        boolean rankUp = rankAfter != rankBefore;
 
+        // Build response
         TaskDTO.CompleteResponse response = new TaskDTO.CompleteResponse();
         response.setTask(TaskDTO.Response.fromTask(task));
         response.setXpEarned(xpEarned);
         response.setTotalXp(user.getTotalXp());
         response.setLevel(user.getLevel());
         response.setHunterRank(rankAfter.getDisplayName());
-        response.setRankUpOccurred(rankUp);
-        if (rankUp) {
+        response.setRankUpOccurred(rankUpOccurred);
+        if (rankUpOccurred) {
             response.setRankUpMessage(
                 "RANK UP! You are now " + rankAfter.getDisplayName() + "!"
             );
@@ -240,13 +246,5 @@ public class TaskService {
                     .orElseThrow(() -> new RuntimeException("Tag not found: id=" + tagId)));
         }
         return tags;
-    }
-
-    private int calculateEarned(int base, Task.Priority priority) {
-        return switch (priority) {
-            case LOW    -> base;
-            case MEDIUM -> (int) (base * 1.5);
-            case HIGH   -> base * 2;
-        };
     }
 }

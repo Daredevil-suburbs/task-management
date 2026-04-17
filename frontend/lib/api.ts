@@ -1,205 +1,229 @@
 /**
- * Hunter System API Client
- * Connects the Next.js frontend to the Spring Boot backend.
+ * Centralized API client for the Hunter System backend.
+ *
+ * All authenticated requests include the JWT from localStorage.
+ * The backend runs on http://localhost:8080.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ""
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-// ─── Types matching Spring Boot DTOs ─────────────────────────────────
-
-export interface TaskResponse {
-  id: number
-  title: string
-  description: string
-  status: "TODO" | "IN_PROGRESS" | "DONE"
-  priority: "LOW" | "MEDIUM" | "HIGH"
-  dueDate: string | null
-  xpReward: number
-  completed: boolean
-  completedAt: string | null
-  category: { id: number; name: string; color: string } | null
-  tags: { id: number; name: string; color: string }[] | null
-  subtasks: { id: number; title: string; completed: boolean }[] | null
-  recurringQuestId: number | null
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CompleteResponse {
-  task: TaskResponse
-  xpEarned: number
-  totalXp: number
-  level: number
-  hunterRank: string
-  rankUpOccurred: boolean
-  rankUpMessage: string | null
-  newAchievements: { name: string; description: string; icon: string }[] | null
-}
-
-export interface UserStatus {
-  name: string
-  email: string
-  totalXp: number
-  level: number
-  hunterRank: string
-  xpToNextLevel: number
-  xpToNextRank: number
-  tasksCompleted: number
-  maxRank: boolean
-}
-
-export interface AuthResponse {
-  token: string
-  email: string
-  name: string
-}
-
-// ─── Token Management ────────────────────────────────────────────────
+// ── Auth helpers ────────────────────────────────────────────────────────────
 
 export function getToken(): string | null {
-  if (typeof window === "undefined") return null
-  return localStorage.getItem("hunter_token")
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("token");
 }
 
-export function setToken(token: string): void {
-  localStorage.setItem("hunter_token", token)
+export function setToken(token: string) {
+  localStorage.setItem("token", token);
 }
 
-export function clearToken(): void {
-  localStorage.removeItem("hunter_token")
+export function clearToken() {
+  localStorage.removeItem("token");
 }
 
-// ─── Core Fetch Wrapper ──────────────────────────────────────────────
+// ── Core fetch wrapper ──────────────────────────────────────────────────────
 
 async function apiFetch<T>(
-  endpoint: string,
+  path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = getToken()
+  const token = getToken();
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
-  }
+  };
 
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
-  })
+  });
 
-  if (res.status === 401) {
-    clearToken()
+  if (res.status === 401 || res.status === 403) {
+    clearToken();
     if (typeof window !== "undefined") {
-      window.location.href = "/login"
+      window.location.href = "/login";
     }
-    throw new Error("Unauthorized — session expired")
+    throw new Error("Unauthorized");
   }
 
   if (!res.ok) {
-    const errorBody = await res.text().catch(() => "Unknown error")
-    throw new Error(`API Error ${res.status}: ${errorBody}`)
+    const errorBody = await res.text();
+    throw new Error(errorBody || `API error: ${res.status}`);
   }
 
   // Handle 204 No Content
   if (res.status === 204) {
-    return undefined as T
+    return undefined as T;
   }
 
-  return res.json()
+  return res.json();
 }
 
-// ─── Auth ────────────────────────────────────────────────────────────
+// ── Auth API ────────────────────────────────────────────────────────────────
 
-export async function login(email: string, password: string): Promise<AuthResponse> {
-  const data = await apiFetch<AuthResponse>("/api/auth/login", {
+export interface AuthResponse {
+  token: string;
+  email: string;
+  name: string;
+}
+
+export function login(email: string, password: string) {
+  return apiFetch<AuthResponse>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
-  })
-  setToken(data.token)
-  return data
+  });
 }
 
-export async function register(
-  name: string,
-  email: string,
-  password: string
-): Promise<AuthResponse> {
-  const data = await apiFetch<AuthResponse>("/api/auth/register", {
+export function register(name: string, email: string, password: string) {
+  return apiFetch<AuthResponse>("/api/auth/register", {
     method: "POST",
     body: JSON.stringify({ name, email, password }),
-  })
-  setToken(data.token)
-  return data
+  });
 }
 
-// ─── Tasks (Quests) ──────────────────────────────────────────────────
+// ── User Status API ─────────────────────────────────────────────────────────
 
-export async function fetchTasks(filters?: {
-  status?: string
-  priority?: string
-}): Promise<TaskResponse[]> {
-  const params = new URLSearchParams()
-  if (filters?.status) params.set("status", filters.status)
-  if (filters?.priority) params.set("priority", filters.priority)
-
-  const query = params.toString()
-  return apiFetch<TaskResponse[]>(`/api/tasks${query ? `?${query}` : ""}`)
+export interface UserStatus {
+  name: string;
+  email: string;
+  totalXp: number;
+  level: number;
+  hunterRank: string;
+  xpToNextLevel: number;
+  xpToNextRank: number;
+  tasksCompleted: number;
+  maxRank: boolean;
 }
 
-export async function fetchTaskById(id: number): Promise<TaskResponse> {
-  return apiFetch<TaskResponse>(`/api/tasks/${id}`)
+export function getUserStatus() {
+  return apiFetch<UserStatus>("/api/user/status");
 }
 
-export async function createTask(task: {
-  title: string
-  description?: string
-  priority?: "LOW" | "MEDIUM" | "HIGH"
-  dueDate?: string
-  xpReward?: number
-  categoryId?: number
-  tagIds?: number[]
-}): Promise<TaskResponse> {
-  return apiFetch<TaskResponse>("/api/tasks", {
-    method: "POST",
-    body: JSON.stringify(task),
-  })
+// ── Tasks API ───────────────────────────────────────────────────────────────
+
+export interface TaskResponse {
+  id: number;
+  title: string;
+  description: string;
+  status: "TODO" | "IN_PROGRESS" | "DONE";
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  dueDate: string | null;
+  xpReward: number;
+  completed: boolean;
+  completedAt: string | null;
+  category: { id: number; name: string; color: string } | null;
+  tags: { id: number; name: string; color: string }[] | null;
+  subtasks: { id: number; title: string; completed: boolean }[] | null;
+  recurringQuestId: number | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export async function updateTask(
-  id: number,
-  task: {
-    title?: string
-    description?: string
-    status?: "TODO" | "IN_PROGRESS" | "DONE"
-    priority?: "LOW" | "MEDIUM" | "HIGH"
-    dueDate?: string
-    xpReward?: number
-  }
-): Promise<TaskResponse> {
-  return apiFetch<TaskResponse>(`/api/tasks/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(task),
-  })
+export interface CompleteResponse {
+  task: TaskResponse;
+  xpEarned: number;
+  totalXp: number;
+  level: number;
+  hunterRank: string;
+  rankUpOccurred: boolean;
+  rankUpMessage: string | null;
+  newAchievements: { name: string; description: string; icon: string }[] | null;
 }
 
-export async function completeTask(id: number): Promise<CompleteResponse> {
+export function getTasks(status?: string, priority?: string) {
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  if (priority) params.set("priority", priority);
+  const qs = params.toString();
+  return apiFetch<TaskResponse[]>(`/api/tasks${qs ? `?${qs}` : ""}`);
+}
+
+export function completeTask(id: number) {
   return apiFetch<CompleteResponse>(`/api/tasks/${id}/complete`, {
     method: "PATCH",
-  })
+  });
 }
 
-export async function deleteTask(id: number): Promise<void> {
+export function deleteTask(id: number) {
   return apiFetch<void>(`/api/tasks/${id}`, {
     method: "DELETE",
-  })
+  });
 }
 
-// ─── User ────────────────────────────────────────────────────────────
-
-export async function fetchUserStatus(): Promise<UserStatus> {
-  return apiFetch<UserStatus>("/api/user/status")
+export function createTask(data: {
+  title: string;
+  description?: string;
+  priority?: string;
+  dueDate?: string;
+  xpReward?: number;
+  categoryId?: number;
+  tagIds?: number[];
+}) {
+  return apiFetch<TaskResponse>("/api/tasks", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
+
+// ── Chat API ────────────────────────────────────────────────────────────────
+
+export interface ChatResponse {
+  reply: string;
+  hunterRank: string;
+  pendingTasksToday: number;
+  completedTasksToday: number;
+}
+
+export function chatWithAssistant(message: string) {
+  return apiFetch<ChatResponse>("/api/chat/assistant", {
+    method: "POST",
+    body: JSON.stringify({ message }),
+  });
+}
+
+// ── Health & Daily Log API ──────────────────────────────────────────────────
+
+export interface DailyLogRequest {
+  mood: number;
+  energyLevel: number;
+  focusLevel: number;
+  sleepHours: number;
+  medsTaken: boolean;
+}
+
+export interface DailyLogResponse {
+  id: number;
+  logDate: string;
+  mood: number;
+  energyLevel: number;
+  focusLevel: number;
+  sleepHours: number;
+  medsTaken: boolean;
+}
+
+export interface PredictionResponse {
+  status: string;
+  recommendation: string;
+}
+
+export function logDailyStats(data: DailyLogRequest) {
+  return apiFetch<DailyLogResponse>("/api/health/log", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getRecentLogs() {
+  return apiFetch<DailyLogResponse[]>("/api/health/log/recent");
+}
+
+export function getSystemPrediction() {
+  return apiFetch<PredictionResponse>("/api/health/prediction");
+}
+

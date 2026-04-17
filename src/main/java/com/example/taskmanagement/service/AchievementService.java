@@ -58,7 +58,7 @@ public class AchievementService {
         checkRankMilestone(user, "RANK_C", HunterRank.C, newUnlocks);
         checkRankMilestone(user, "RANK_B", HunterRank.B, newUnlocks);
         checkRankMilestone(user, "RANK_A", HunterRank.A, newUnlocks);
-        checkRankMilestone(user, "RANK_S", HunterRank.S, newUnlocks);
+        // S-rank removed, A is now max rank
 
         // ── XP milestones ─────────────────────────────────────────────────
         checkXpMilestone(user, "XP_1000",  1000,  newUnlocks);

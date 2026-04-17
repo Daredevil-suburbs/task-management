@@ -1,14 +1,17 @@
-/** 
+/**
  * @author Daredevil-suburbs
  */
 package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.dto.UserDTO;
 import com.example.taskmanagement.dto.UserStatusDTO;
+import com.example.taskmanagement.event.RankUpEvent;
+import com.example.taskmanagement.model.HunterRank;
 import com.example.taskmanagement.model.User;
 import com.example.taskmanagement.repository.TaskRepository;
 import com.example.taskmanagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,18 +25,28 @@ import java.util.UUID;
 @SuppressWarnings("null")
 public class UserService {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private TaskRepository taskRepository;
-    @Autowired private LevelService levelService;
-    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private LevelService levelService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public UserStatusDTO getStatus(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         int tasksCompleted = taskRepository.countCompletedByUserId(user.getId());
-        int xpToNextLevel  = levelService.xpToNextLevel(user);
-        int xpToNextRank   = levelService.xpToNextRank(user);
+        int xpToNextLevel = levelService.xpToNextLevel(user);
+        int xpToNextRank = levelService.xpToNextRank(user);
 
         return UserStatusDTO.from(user, xpToNextLevel, xpToNextRank, tasksCompleted);
     }
@@ -140,6 +153,56 @@ public class UserService {
         }
 
         userRepository.save(user);
+    }
+
+    /**
+     * Evaluates if a user should rank up based on their new total XP.
+     * If a rank change occurs, publishes a RankUpEvent for notification handling.
+     *
+     * @param user      the user to evaluate (must have updated totalXp)
+     * @param oldRank   the user's rank before XP was awarded
+     * @return true if a rank up occurred, false otherwise
+     */
+    @Transactional
+    public boolean checkRankUp(User user, HunterRank oldRank) {
+        HunterRank newRank = HunterRank.fromXp(user.getTotalXp());
+
+        if (newRank != oldRank && newRank.ordinal() > oldRank.ordinal()) {
+            // Rank up occurred!
+            user.setHunterRank(newRank);
+
+            // Publish event for notifications, logging, etc.
+            eventPublisher.publishEvent(new RankUpEvent(
+                    this,
+                    user.getId(),
+                    user.getEmail(),
+                    oldRank,
+                    newRank,
+                    user.getTotalXp()
+            ));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Convenience method to add XP and check for rank up in one call.
+     *
+     * @param user      the user to update
+     * @param xpAmount  the amount of XP to add
+     * @return the new HunterRank after evaluation
+     */
+    @Transactional
+    public HunterRank addXpAndCheckRank(User user, int xpAmount) {
+        HunterRank oldRank = user.getHunterRank();
+        user.setTotalXp(user.getTotalXp() + xpAmount);
+        user.setLevel(HunterRank.levelFromXp(user.getTotalXp()));
+
+        checkRankUp(user, oldRank);
+
+        return user.getHunterRank();
     }
 
     public int getStreak(String email) {
