@@ -118,12 +118,11 @@
   }
 }
 
-/* Shimmer animation for skeleton loading */
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
   }
-  100% {
-    transform: translateX(100%);
+  50% {
+    background-position: 100% 50%;
   }
 }
